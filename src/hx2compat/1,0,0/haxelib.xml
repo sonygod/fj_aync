@@ -1,0 +1,6 @@
+<project name="hx2compat" url="https://github.com/Simn/hx2compat" license="BSD">
+    <user name="Simn"/>
+    <tag v="cross"/>
+    <description>Some haxe 2 types for easier migration to haxe 3.</description>
+    <version name="1.0.0">Initial</version>
+</project>

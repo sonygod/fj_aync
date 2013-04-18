@@ -1,0 +1,11 @@
+-main JsMain 
+-cp src 
+-js remoting.js 
+
+--next
+-cp src 
+-lib hx2compat
+-main FlashMain
+
+
+-swf remoting.swf 
