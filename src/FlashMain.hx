@@ -20,9 +20,9 @@ class FlashMain {
     js = haxe.remoting.ExternalConnection.jsConnect("default", ctx);
 	var arr:Array<Int> = [1, 2];
 	var arr2=arr.slice(0, arr.length - 1);
-	        hello = new Forwarder(js);
+	 hello = new Forwarder(js);
 			
-     	   hello.sayHello("hi", "god", onCalljs);
+     hello.sayHello("hi", "god", onCalljs);
 	 
   }
 
