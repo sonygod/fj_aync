@@ -1,13 +1,17 @@
 package ;
+import Forwarder;
+import haxe.remoting.Context;
 import js.Browser;
 
-import Format;
+import FormatAsync;
+using Reflect;
 
 class JsMain {
-     public static var cnx = null;
-    static var ctx = null;
+     public static var cnx:ExternalConnectionAsync = null;
+    static var ctx:Context = null;
    
 	public static var onData: Dynamic;
+    private static var hello:IHelloServer;
 	 private static function __init__() : Void {
     onData = Reflect.makeVarArgs(__onData);
  
@@ -17,28 +21,46 @@ class JsMain {
        ctx = new haxe.remoting.Context();
       
 	   ctx.addObject("main",JsMain);
-	    cnx = ExternalConnectionAsync.flashConnect("default", "myFlashObject", ctx);
+       
+	   cnx = ExternalConnectionAsync.flashConnect("default", "myFlashObject", ctx);
+	   //register module 
+	   hello=new Forwarder(cnx,"hello",HelloService.getInstance());
 	  
-	   
-	   
-	   
 	    }
-		//http://www.verydemo.com/demo_c98_i5393.html
-		
+	
 		public static function __onData(args: Array<Dynamic>) {
+     
 			
 			
-	   
-			Browser.window.alert("length=" + args[2].id);
+			trace("callBack ready");
+	        //get callBackObject
+		    var callBackObj :CallBackObj = args.pop();
+			//add callBack function to args
+			args.push(callFlashSync);
+	         //get current platform class
+			var callBackObjWithFun:CallBackObjWithFun = cnx.getcallBackList().get(callBackObj.id+"");
+
+           
+			var classCallback :Dynamic= callBackObjWithFun.callBack;
 		
+			try{
+			classCallback.callMethod(classCallback.field(callBackObj.name), args);
 			
-			Test.bubblesort([1, 2, 9, 7, 6, 0.3], function (err, data) { 
-				
-				 cnx = ExternalConnectionAsync.flashConnect("default", "myFlashObject", ctx);
-				cnx.FlashMain.onData.call([err,data,args[2]]); 
-				
-				} );
+			}catch (e:Dynamic) {
+				trace(e);
+				return ;
+			}
+			return ;
 			
+		}
+		
+		public static function callFlashSync(err, data,callBackObj:CallBackObj):Void {
+           //don't know why much defined again, if no ,it will error 
+            cnx = ExternalConnectionAsync.flashConnect("default", "myFlashObject", ctx);
+            cnx.FlashMain.onData.call([err,data,callBackObj]);
+		   
+		 
+			   
 		}
 		
 }

@@ -20,9 +20,10 @@
  * DEALINGS IN THE SOFTWARE.
  */
 package ;
-import Format;
+import FormatAsync;
 import haxe.remoting.Connection;
 import haxe.remoting.Context;
+import IECAsync;
 
 /**
 	Synchronous communications between Flash and Javascript.
@@ -104,11 +105,7 @@ class ExternalConnectionAsync implements Connection implements Dynamic<Connectio
 		return new haxe.Unserializer(data).unserialize();
 	}
 	
-		public function callWithCallBack( params : Array<Dynamic> ) : Dynamic {
-			
-			
-			return call(params);
-		}
+	
 
 	static var connections = new haxe.ds.StringMap<ExternalConnectionAsync>();
 	 static var  callBackList = new haxe.ds.StringMap<CallBackObjWithFun>();
