@@ -27,7 +27,7 @@ class HelloService implements IHelloServer{
 
     public function sayHello(x:String, y:String, cb:Dynamic->Dynamic->CallBackObj->Void):Void {
 
-		trace("get sayheloo now");
+		//trace("get sayheloo now");
         cb(null,x + y,{id:name,name:"sayHello"});
 
     }

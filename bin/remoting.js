@@ -168,7 +168,6 @@ HelloService.getInstance = function() {
 }
 HelloService.prototype = {
 	sayHello: function(x,y,cb) {
-		console.log("get sayheloo now");
 		cb(null,x + y,{ id : this.name, name : "sayHello"});
 	}
 	,__class__: HelloService
@@ -281,12 +280,10 @@ JsMain.main = function() {
 	JsMain.hello = new Forwarder(JsMain.cnx,"hello",HelloService.getInstance());
 }
 JsMain.__onData = function(args) {
-	console.log("callBack ready");
 	var callBackObj = args.pop();
 	args.push(JsMain.callFlashSync);
 	var callBackObjWithFun = JsMain.cnx.getcallBackList().get(callBackObj.id + "");
 	var classCallback = callBackObjWithFun.callBack;
-	console.log("arg2" + Std.string(callBackObj));
 	try {
 		Reflect.field(classCallback,callBackObj.name).apply(classCallback,args);
 	} catch( e ) {
@@ -298,7 +295,6 @@ JsMain.__onData = function(args) {
 JsMain.callFlashSync = function(err,data,callBackObj) {
 	JsMain.cnx = ExternalConnectionAsync.flashConnect("default","myFlashObject",JsMain.ctx);
 	JsMain.cnx.resolve("FlashMain").resolve("onData").call([err,data,callBackObj]);
-	js.Browser.window.alert("finishcall js");
 }
 var List = function() {
 	this.length = 0;

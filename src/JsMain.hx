@@ -32,7 +32,7 @@ class JsMain {
      
 			
 			
-			trace("callBack ready");
+		
 	        //get callBackObject
 		    var callBackObj :CallBackObj = args.pop();
 			//add callBack function to args

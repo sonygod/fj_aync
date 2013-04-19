@@ -6,8 +6,8 @@
     <movie input="" />
     <movie path="bin\remoting.swf" />
     <movie fps="0" />
-    <movie width="0" />
-    <movie height="0" />
+    <movie width="1024" />
+    <movie height="768" />
     <movie version="10" />
     <movie minorVersion="0" />
     <movie platform="Flash Player" />

@@ -72,6 +72,8 @@ class ExternalConnectionAsync implements Connection implements Dynamic<Connectio
 		 var p:CallBackObj = params[params.length - 1];
 		 callBackList.set(p.id + p.name, { id:p.id, name:p.name, callBack:callBackF } );
 		 #end
+		 
+		
 	
 		var s = new haxe.Serializer();
 		s.serialize(params);
