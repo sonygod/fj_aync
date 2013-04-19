@@ -1,6 +1,6 @@
 package ;
 import js.Browser;
-import haxe.remoting.ExternalConnection;
+
 import Format;
 
 class JsMain {
@@ -17,7 +17,7 @@ class JsMain {
        ctx = new haxe.remoting.Context();
       
 	   ctx.addObject("main",JsMain);
-	    cnx = ExternalConnection.flashConnect("default", "myFlashObject", ctx);
+	    cnx = ExternalConnectionAsync.flashConnect("default", "myFlashObject", ctx);
 	  
 	   
 	   
@@ -34,7 +34,7 @@ class JsMain {
 			
 			Test.bubblesort([1, 2, 9, 7, 6, 0.3], function (err, data) { 
 				
-				 cnx = ExternalConnection.flashConnect("default", "myFlashObject", ctx);
+				 cnx = ExternalConnectionAsync.flashConnect("default", "myFlashObject", ctx);
 				cnx.FlashMain.onData.call([err,data,args[2]]); 
 				
 				} );

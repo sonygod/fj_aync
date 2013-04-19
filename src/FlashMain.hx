@@ -2,7 +2,7 @@ package ;
 import haxe.ds.ObjectMap;
 import haxe.ds.StringMap;
 import haxe.Timer;
-import haxe.remoting.ExternalConnection;
+
 import tink.lang.Cls; 
 import Format;
 /**
@@ -11,13 +11,13 @@ import Format;
  */
 class FlashMain {
   public function foo(x, y) { trace("outsidecall" + x + y); }
-   static var js:ExternalConnection = null;
+   static var js:ExternalConnectionAsync= null;
   static  var hello;
   public static var onData: Dynamic;
  public static function main() {
     var ctx = new haxe.remoting.Context(); 
    	 ctx.addObject("FlashMain", FlashMain);
-    js = haxe.remoting.ExternalConnection.jsConnect("default", ctx);
+    js = ExternalConnectionAsync.jsConnect("default", ctx);
 	var arr:Array<Int> = [1, 2];
 	var arr2=arr.slice(0, arr.length - 1);
 	 hello = new Forwarder(js);
@@ -68,7 +68,7 @@ class Forwarder implements Cls {
     var fields:Hash<Dynamic> = new Hash<Dynamic>();
 	
 	public var recallFuns:ObjectMap<Caller ,Dynamic>=new ObjectMap<Caller ,Dynamic>();
-    @:forward(!multiply) var target:ExternalConnection;
+    @:forward(!multiply) var target:ExternalConnectionAsync;
 
     @:forward function fwd2(hello:HelloService) {
     get: fields.get($name),
