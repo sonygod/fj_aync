@@ -10,58 +10,65 @@ import FormatAsync;
  */
 class FlashMain {
 
-   static var js:ExternalConnectionAsync= null;
-  static  var hello:IHelloServer;
-  public static var onData: Dynamic;
- public static function main() {
-    var ctx = new haxe.remoting.Context(); 
-   	 ctx.addObject("FlashMain", FlashMain);
+    static var cnx:ExternalConnectionAsync = null;
+    static var hello:IHelloServer;
+    public static var onData:Dynamic;
 
-    js = ExternalConnectionAsync.jsConnect("default", ctx);
+    public static function main() {
+        var ctx = new haxe.remoting.Context();
+        ctx.addObject("main", FlashMain);
 
-	var arr:Array<Int> = [1, 2];
-	var arr2=arr.slice(0, arr.length - 1);
-	 hello = new Forwarder(js,"hello",HelloService.getInstance());
-			
-     hello.sayHello("hi", "god", onCalljs);
-     
+        cnx = ExternalConnectionAsync.jsConnect("default", ctx);
 
-	 
-  }
+        var arr:Array<Int> = [1, 2];
+        var arr2 = arr.slice(0, arr.length - 1);
+        hello = new Forwarder(cnx, "hello", HelloService.getInstance());
 
-    public static function onCalljs(err,data):Void{
+        hello.sayHello("hi", "god", onCalljs);
 
-      trace("async come back "+data);
+        hello.sayHello("hi", "god2", onCalljs2);
+
     }
-  
-  public static function __onData(args: Array<Dynamic>) {
-	  
-	  
-	  //trace(args.toString() + "" + Timer.stamp() * 1000);
-	  var recall = args.pop();
-	  
-	  trace(args.toString() + "" + Timer.stamp() * 1000);
-	  
-	 var xxx:StringMap<CallBackObjWithFun> = js.getcallBackList();
-	 
-	 
-	 var f :CallBackObjWithFun= xxx.get(recall.id + recall.name);
-	 
-	 
-	 trace(f.id+f.name+f.callBack);
-	 Reflect.callMethod(FlashMain, f.callBack, args);
-	  
-	  
-	  
-	
-	
-  }
-  
-   private static function __init__() : Void {
-    onData = Reflect.makeVarArgs(__onData);
- 
- }
-  
+
+    public static function onCalljs(err, data):Void {
+
+        trace("async come back " + data);
+    }
+
+    public static function onCalljs2(err, data):Void {
+
+        trace("2async come back " + data);
+    }
+
+    public static function __onData(args:Array<Dynamic>) {
+
+
+        var callBackObj:CallBackObj = args.pop();
+        var classObject:CallBackObjWithFun = cnx.getcallBackList().get(callBackObj.id + "");
+        var method:CallBackObjWithFun = cnx.getcallBackList().get(callBackObj.id + callBackObj.name);
+        var classCallback:Dynamic = classObject.callBack;
+
+      
+        try {
+
+          /*  trace("classCallback"+classCallback);
+            trace("method"+method.callBack);
+            trace("args"+args);*/
+            Reflect.callMethod(classCallback, method.callBack, args);
+        } catch (e:Dynamic) {
+            trace(e);
+            return ;
+        }
+        return ;
+
+
+    }
+
+    private static function __init__():Void {
+        onData = Reflect.makeVarArgs(__onData);
+
+    }
+
 }
 
 

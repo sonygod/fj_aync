@@ -57,7 +57,7 @@ class JsMain {
 		public static function callFlashSync(err, data,callBackObj:CallBackObj):Void {
            //don't know why much defined again, if no ,it will error 
             cnx = ExternalConnectionAsync.flashConnect("default", "myFlashObject", ctx);
-            cnx.FlashMain.onData.call([err,data,callBackObj]);
+            cnx.main.onData.call([err,data,callBackObj]);
 		   
 		 
 			   

@@ -9,6 +9,7 @@ package ;
 import haxe.remoting.Context;
 import haxe.remoting.ExternalConnection;
 import FormatAsync;
+import org.transition9.async.Step;
 class HelloService implements IHelloServer{
 
    public var name:String="hello";
@@ -28,7 +29,20 @@ class HelloService implements IHelloServer{
     public function sayHello(x:String, y:String, cb:Dynamic->Dynamic->CallBackObj->Void):Void {
 
 		//trace("get sayheloo now");
-        cb(null,x + y,{id:name,name:"sayHello"});
+		var platform:String;
+		#if flash
+		platform = "flash";
+		 cb(null,x + y+" platform"+platform,{id:name,name:"sayHello"});
+		#else
+		x += ":js";
+		platform = "js";
+		
+		
+		
+		Test.main(function(err, data) { cb(null, data, { id:name, name:"sayHello" } ); } );
+		
+		#end
+       
 
     }
 

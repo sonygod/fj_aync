@@ -26,7 +26,7 @@ class Test implements Build
 			swapping = true;
 			for (i in 0...array.length) {
 			
-				[]=delay(1);
+				[]=delay(200);
 				if (array[i] > array[i+1]) {
 					temp = array[i+1];
 					array[i+1] = array[i];
@@ -79,30 +79,30 @@ class Test implements Build
 	}
 	
 	public static function getResult(err:NodeErr, data:Array<Float>) {
-		trace("end"+(Timer.stamp()*1000-startTime));
-		trace(data);
+		//trace("end"+(Timer.stamp()*1000-startTime));
+		//trace(data);
 		
 			
 	}
 	
 	 @async(var ret:Bool) public static function doFooParallel(arrayData:Array<Float>) {
-		trace(Timer.stamp() * 10000 + "" + arrayData);
+		//trace(Timer.stamp() * 10000 + "" + arrayData);
 	return true;
 	};
 	
 	//
 	@async(var ret:Bool) public static function doFooGroup(?arg1:String) {
-		trace(Timer.stamp() * 10000 + "doFooGroup" + arg1);
+		//trace(Timer.stamp() * 10000 + "doFooGroup" + arg1);
 	return true;
 	};
 	
 	 @async(var ret:Bool)public static function  doSomethingElseAsync(array) {
-		trace(Timer.stamp() * 10000 + " doSomethingElseAsync" + array);
+		//trace(Timer.stamp() * 10000 + " doSomethingElseAsync" + array);
 	return true;
 	};
 	
 	 @async(var ret:Int) public static function  doSomethingElseAsync2(element:Int ) {
-		trace(element);
+		//trace(element);
 		return  element;
 	
 	};
@@ -114,7 +114,7 @@ class Test implements Build
 	};
 	
 	public static var startTime:Float;
-    public static function main() {
+    public static function main(callBack2) {
 	
 		 
 		 
@@ -135,45 +135,25 @@ class Test implements Build
 				  
 			   }
 			   ,function (err, ?arg1,?arg2,?arg3) {
-				  // trace("finish now..."+Timer.stamp()+"arg"+arg1+arg2+arg3);
+				  // //trace("finish now..."+Timer.stamp()+"arg"+arg1+arg2+arg3);
 			     doFooGroup("group1", step.group());
 				  doFooGroup("group1", step.group());
 				   doFooGroup("group1", step.group());
 				  }
 				  ,function (err, args) {
-					  trace("finish"+args);
+					   callBack2(err, args);
 				  }
 		  
 		  ]);
 		   
         
-		  
-		 var fromArray = [1, 2, 3, 4];
-
-var onElement = function (element :Int, cb :String->Int->Void) {
-   platformDelay(100,function () {
-        cb("Some int=" + element,1);
-    });
-
-}
-
-var onFinish = function (err :Dynamic, result1:String->Int->Void) {
-    if (err != null) trace("Oh no: " + err);
-    trace("result=" + result1);
-}
-
-//AsyncLambda.map( fromArray,onElement , onFinish);
-
-
-
-
-      doSomethingElseAsync3(1, function(err:String, e:Int,s:String):Void { trace("e=========="+e); } );
+	
 	  
 	
 	
     }
     static inline function delay(ms:Int, cb){
-        platformDelay(ms, function(){ trace(ms+' passed'); cb(null); });
+        platformDelay(ms, function(){cb(null); });
     }
 
     static inline function platformDelay(ms:Int, fun){

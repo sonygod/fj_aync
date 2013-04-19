@@ -168,7 +168,13 @@ HelloService.getInstance = function() {
 }
 HelloService.prototype = {
 	sayHello: function(x,y,cb) {
-		cb(null,x + y,{ id : this.name, name : "sayHello"});
+		var _g = this;
+		var platform;
+		x += ":js";
+		platform = "js";
+		Test.main(function(err,data) {
+			cb(null,data,{ id : _g.name, name : "sayHello"});
+		});
 	}
 	,__class__: HelloService
 }
@@ -232,6 +238,21 @@ IECAsyc.__name__ = ["IECAsyc"];
 IECAsyc.prototype = {
 	__class__: IECAsyc
 }
+var IntIterator = function(min,max) {
+	this.min = min;
+	this.max = max;
+};
+$hxClasses["IntIterator"] = IntIterator;
+IntIterator.__name__ = ["IntIterator"];
+IntIterator.prototype = {
+	next: function() {
+		return this.min++;
+	}
+	,hasNext: function() {
+		return this.min < this.max;
+	}
+	,__class__: IntIterator
+}
 var Reflect = function() { }
 $hxClasses["Reflect"] = Reflect;
 Reflect.__name__ = ["Reflect"];
@@ -294,7 +315,7 @@ JsMain.__onData = function(args) {
 }
 JsMain.callFlashSync = function(err,data,callBackObj) {
 	JsMain.cnx = ExternalConnectionAsync.flashConnect("default","myFlashObject",JsMain.ctx);
-	JsMain.cnx.resolve("FlashMain").resolve("onData").call([err,data,callBackObj]);
+	JsMain.cnx.resolve("main").resolve("onData").call([err,data,callBackObj]);
 }
 var List = function() {
 	this.length = 0;
@@ -345,6 +366,131 @@ StringTools.urlEncode = function(s) {
 }
 StringTools.urlDecode = function(s) {
 	return decodeURIComponent(s.split("+").join(" "));
+}
+var async = {}
+async.Build = function() { }
+$hxClasses["async.Build"] = async.Build;
+async.Build.__name__ = ["async","Build"];
+var Test = function() { }
+$hxClasses["Test"] = Test;
+Test.__name__ = ["Test"];
+Test.__interfaces__ = [async.Build];
+Test.asyncGet2 = function(v1,v2,cb) {
+	cb(null,v1,v2);
+}
+Test.bubblesort = function(array,__cb) {
+	var swapping = false;
+	var temp;
+	var __afterLoop4 = function() {
+		__cb(null,array);
+	};
+	var __loop3 = (function($this) {
+		var $r;
+		var __loop31 = null;
+		__loop31 = function() {
+			if(!swapping) {
+				swapping = true;
+				var __afterLoop1 = function() {
+					__loop31();
+				};
+				var __iter2 = new IntIterator(0,array.length);
+				var __loop0 = (function($this) {
+					var $r;
+					var __loop01 = null;
+					__loop01 = function() {
+						if(__iter2.hasNext()) {
+							var i = __iter2.next();
+							Test.delay(200,function(__e) {
+								if(__e == null) {
+									if(array[i] > array[i + 1]) {
+										temp = array[i + 1];
+										array[i + 1] = array[i];
+										array[i] = temp;
+										swapping = false;
+									}
+									__loop01();
+								} else __cb(__e,null);
+							});
+						} else __afterLoop1();
+					};
+					$r = __loop01;
+					return $r;
+				}(this));
+				__loop0();
+			} else __afterLoop4();
+		};
+		$r = __loop31;
+		return $r;
+	}(this));
+	__loop3();
+}
+Test.asynchronous = function(__cb) {
+	var arry;
+	Test.bubblesort([1337,1,-465,3.141592653589793,789,69,789,-132,3.141592653589793,465,789,0,27],function(__e,__0) {
+		if(__e == null) {
+			arry = __0;
+			__cb(null,arry);
+		} else __cb(__e,null);
+	});
+}
+Test.bubblesortSync = function(array) {
+	var swapping = false;
+	var temp;
+	while(!swapping) {
+		swapping = true;
+		var _g1 = 0, _g = array.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			if(array[i] > array[i + 1]) {
+				temp = array[i + 1];
+				array[i + 1] = array[i];
+				array[i] = temp;
+				swapping = false;
+			}
+		}
+	}
+	return array;
+}
+Test.getResult = function(err,data) {
+}
+Test.doFooParallel = function(arrayData,__cb) {
+	__cb(null,true);
+}
+Test.doFooGroup = function(arg1,__cb) {
+	__cb(null,true);
+}
+Test.doSomethingElseAsync = function(array,__cb) {
+	__cb(null,true);
+}
+Test.doSomethingElseAsync2 = function(element,__cb) {
+	__cb(null,element);
+}
+Test.doSomethingElseAsync3 = function(element,__cb) {
+	__cb(null,element,"1");
+}
+Test.main = function(callBack2) {
+	var step = new org.transition9.async.Step();
+	step.chain([function() {
+		Test.bubblesort([2,1,4,7],$bind(step,step.cb));
+	},function(err,arrayData) {
+		Test.doFooParallel(arrayData,step.parallel());
+		Test.doFooParallel(arrayData,step.parallel());
+		Test.doFooParallel(arrayData,step.parallel());
+	},function(err,arg1,arg2,arg3) {
+		Test.doFooGroup("group1",step.group());
+		Test.doFooGroup("group1",step.group());
+		Test.doFooGroup("group1",step.group());
+	},function(err,args) {
+		callBack2(err,args);
+	}]);
+}
+Test.delay = function(ms,cb) {
+	haxe.Timer.delay(function() {
+		cb(null);
+	},ms);
+}
+Test.platformDelay = function(ms,fun) {
+	haxe.Timer.delay(fun,ms);
 }
 var ValueType = $hxClasses["ValueType"] = { __ename__ : ["ValueType"], __constructs__ : ["TNull","TInt","TFloat","TBool","TObject","TFunction","TClass","TEnum","TUnknown"] }
 ValueType.TNull = ["TNull",0];
@@ -435,6 +581,9 @@ Type["typeof"] = function(v) {
 		return ValueType.TUnknown;
 	}
 }
+async.Async = function() { }
+$hxClasses["async.Async"] = async.Async;
+async.Async.__name__ = ["async","Async"];
 haxe.Serializer = function() {
 	this.buf = new StringBuf();
 	this.cache = new Array();
@@ -683,6 +832,33 @@ haxe.Serializer.prototype = {
 		return this.buf.b;
 	}
 	,__class__: haxe.Serializer
+}
+haxe.Timer = function(time_ms) {
+	var me = this;
+	this.id = setInterval(function() {
+		me.run();
+	},time_ms);
+};
+$hxClasses["haxe.Timer"] = haxe.Timer;
+haxe.Timer.__name__ = ["haxe","Timer"];
+haxe.Timer.delay = function(f,time_ms) {
+	var t = new haxe.Timer(time_ms);
+	t.run = function() {
+		t.stop();
+		f();
+	};
+	return t;
+}
+haxe.Timer.prototype = {
+	run: function() {
+		console.log("run");
+	}
+	,stop: function() {
+		if(this.id == null) return;
+		clearInterval(this.id);
+		this.id = null;
+	}
+	,__class__: haxe.Timer
 }
 haxe.Unserializer = function(buf) {
 	this.buf = buf;
@@ -1208,6 +1384,145 @@ js.Boot.__instanceof = function(o,cl) {
 js.Browser = function() { }
 $hxClasses["js.Browser"] = js.Browser;
 js.Browser.__name__ = ["js","Browser"];
+var org = {}
+org.transition9 = {}
+org.transition9.async = {}
+org.transition9.async.AsyncLambda = function() { }
+$hxClasses["org.transition9.async.AsyncLambda"] = org.transition9.async.AsyncLambda;
+org.transition9.async.AsyncLambda.__name__ = ["org","transition9","async","AsyncLambda"];
+org.transition9.async.AsyncLambda.iter = function(it,f,onFinish) {
+	var iterator = $iterator(it)();
+	var asyncCall = null;
+	asyncCall = function() {
+		if(iterator.hasNext()) try {
+			f(iterator.next(),asyncCall);
+		} catch( err ) {
+			onFinish(err);
+		} else onFinish(null);
+	};
+	asyncCall();
+}
+org.transition9.async.AsyncLambda.map = function(it,f,onFinish) {
+	var mappedElements = [];
+	var iterator = $iterator(it)();
+	var asyncCall = null;
+	asyncCall = function() {
+		if(iterator.hasNext()) try {
+			f(iterator.next(),function(b) {
+				mappedElements.push(b);
+				asyncCall();
+			});
+		} catch( err ) {
+			onFinish(err,null);
+		} else onFinish(null,mappedElements);
+	};
+	asyncCall();
+}
+org.transition9.async.Step = function() {
+	this._chain = [];
+	this._callId = -1;
+};
+$hxClasses["org.transition9.async.Step"] = org.transition9.async.Step;
+org.transition9.async.Step.__name__ = ["org","transition9","async","Step"];
+org.transition9.async.Step.prototype = {
+	callNext: function(args) {
+		this._callId++;
+		if(this._groupedCall != null) {
+			this._groupedCall.shutdown();
+			this._groupedCall = null;
+		}
+		try {
+			this._chain.shift().apply(null,args);
+		} catch( e ) {
+			console.log("Step caught exception: " + Std.string(e));
+			if(this._chain != null && this._chain.length > 0) this.callNext([e,null]); else throw e;
+		}
+	}
+	,createCallback: function(isParallel) {
+		if(this._groupedCall == null) this._groupedCall = new org.transition9.async.GroupedCall(this._callId,isParallel,$bind(this,this.callNext)); else null;
+		return this._groupedCall.createCallback();
+	}
+	,handleError: function(err) {
+		this.callNext([err,null]);
+	}
+	,group: function() {
+		return this.createCallback(false);
+	}
+	,parallel: function() {
+		return this.createCallback(true);
+	}
+	,cb0: function() {
+		this.cb(null,null);
+	}
+	,cb1: function(result) {
+		this.cb(null,result);
+	}
+	,cb: function(err,result) {
+		this.callNext([err,err == null?result:null]);
+	}
+	,chain: function(arr) {
+		var _g = 0;
+		while(_g < arr.length) {
+			var f = arr[_g];
+			++_g;
+			this._chain.push(f);
+		}
+		this.callNext([]);
+	}
+	,__class__: org.transition9.async.Step
+}
+org.transition9.async.GroupedCall = function(callId,isParallel,callNext) {
+	this.callId = callId;
+	this.isParallel = isParallel;
+	this._groupedFunctionIndex = this._pending = 0;
+	this._pendingResults = [];
+	this.callNext = callNext;
+};
+$hxClasses["org.transition9.async.GroupedCall"] = org.transition9.async.GroupedCall;
+org.transition9.async.GroupedCall.__name__ = ["org","transition9","async","GroupedCall"];
+org.transition9.async.GroupedCall.prototype = {
+	calledGroupCallback: function() {
+		if(this._pending == 0 && !this.finished) {
+			this.finished = true;
+			if(this.isParallel) {
+				this._pendingResults.unshift(this._err);
+				this.callNext(this._pendingResults);
+			} else this.callNext(this._err == null?[null,this._pendingResults]:[this._err,null]);
+		}
+	}
+	,platformDelay: function(ms,fun) {
+		haxe.Timer.delay(fun,ms);
+	}
+	,delay: function(ms,cb) {
+		haxe.Timer.delay(function() {
+			console.log(ms + " passed");
+			cb(null);
+		},ms);
+	}
+	,createCallback: function() {
+		var _g = this;
+		var index = this._groupedFunctionIndex++;
+		this._pending++;
+		return function(err,result) {
+			_g._pending--;
+			if(_g.finished) return;
+			if(err != null || _g._err != null) {
+				_g._pendingResults[index] = null;
+				if(_g._err == null) _g._err = err;
+			} else _g._pendingResults[index] = result;
+			if(_g._pending == 0) haxe.Timer.delay($bind(_g,_g.calledGroupCallback),0);
+		};
+	}
+	,shutdown: function() {
+		this._pendingResults = null;
+		this.callNext = null;
+		this._err = null;
+	}
+	,__class__: org.transition9.async.GroupedCall
+}
+function $iterator(o) { if( o instanceof Array ) return function() { return HxOverrides.iter(o); }; return typeof(o.iterator) == 'function' ? $bind(o,o.iterator) : o.iterator; };
+var $_;
+function $bind(o,m) { var f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; return f; };
 JsMain.onData = Reflect.makeVarArgs(JsMain.__onData);
 Math.__name__ = ["Math"];
 Math.NaN = Number.NaN;
@@ -1236,6 +1551,7 @@ var Class = $hxClasses.Class = { __name__ : ["Class"]};
 var Enum = { };
 ExternalConnectionAsync.connections = new haxe.ds.StringMap();
 ExternalConnectionAsync.callBackList = new haxe.ds.StringMap();
+Test.__meta__ = { statics : { bubblesort : { async : null}, asynchronous : { async : null}, doFooParallel : { async : null}, doFooGroup : { async : null}, doSomethingElseAsync : { async : null}, doSomethingElseAsync2 : { async : null}, doSomethingElseAsync3 : { async : null}}};
 haxe.Serializer.USE_CACHE = false;
 haxe.Serializer.USE_ENUM_INDEX = false;
 haxe.Serializer.BASE64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%:";
