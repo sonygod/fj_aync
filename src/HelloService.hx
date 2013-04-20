@@ -39,7 +39,7 @@ class HelloService implements IHelloServer{
 		
 		
 		
-		Test.main(function(err, data) { cb(null, data, { id:name, name:"sayHello" } ); } );
+		Test.main2(function(err, data) { cb(null, data, { id:name, name:"sayHello" } ); } );
 		
 		#end
        

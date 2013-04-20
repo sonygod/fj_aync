@@ -152,6 +152,30 @@ class Test implements Build
 	
 	
     }
+	//the same result as main.
+	@async(var rect:Array<Dynamic>) public static function main2() {
+		
+		//step
+		[var arrayData] = bubblesort([2, 1, 4, 7]);
+		
+		//paraller
+		[
+		  [var a:Bool] = doFooParallel(arrayData),
+		  [var b:Bool] = doFooParallel(arrayData),
+		  [var c:Bool] = doFooParallel(arrayData),
+		
+		];
+		
+		//group
+		var arr:Array<Dynamic> = [null, null, null];
+		
+		[arr[0]] = doFooGroup("group1");
+		[arr[1]] = doFooGroup("group2");
+		[arr[2]] = doFooGroup("group3");
+		
+		return arr;
+		
+	}
     static inline function delay(ms:Int, cb){
         platformDelay(ms, function(){cb(null); });
     }

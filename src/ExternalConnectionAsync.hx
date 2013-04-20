@@ -22,7 +22,7 @@
 package ;
 
 
-#if flash
+
 import FormatAsync;
 import haxe.remoting.Connection;
 import haxe.remoting.Context;
@@ -173,16 +173,6 @@ class ExternalConnectionAsync implements Connection implements Dynamic<Connectio
 
 }
 
-#else
-import FormatAsync;
-extern class  ExternalConnectionAsync {
-	static function flashConnect( name:Dynamic, flashObjectID:Dynamic, ?ctx:Dynamic ):Dynamic;
-	static function doCall( name : String, path : String, params : String ) : String;
-	function resolve(field:Dynamic):Dynamic;
-	function close():Void;
-	function new( data:Dynamic, path:Dynamic );
-	function getcallBackList():haxe.ds.StringMap<CallBackObjWithFun>;
-}
-#end	
+
 
 
