@@ -74,7 +74,6 @@ ExternalConnectionAsync.prototype = {
 	}
 	,call: function(params) {
 		ExternalConnectionAsync.sn += 1;
-		console.log("sn=" + ExternalConnectionAsync.sn);
 		var s = new haxe.Serializer();
 		s.serialize(params);
 		var params1 = s.toString();
@@ -300,11 +299,9 @@ JsMain.main = function() {
 	JsMain.ctx.addObject("main",JsMain);
 	JsMain.cnx = ExternalConnectionAsync.flashConnect("default","myFlashObject",JsMain.ctx);
 	JsMain.hello = new Forwarder(JsMain.cnx,"hello",HelloService.getInstance());
-	console.log("main---");
 }
 JsMain.__onData = function(args) {
 	var callBackObj = args.pop();
-	console.log("callBackObj" + Std.string(callBackObj));
 	args.push({ cbF : JsMain.callFlashSync, obj : callBackObj});
 	var callBackObjWithFun = JsMain.cnx.getcallBackList().get(callBackObj.id + "");
 	var classCallback = callBackObjWithFun.callBack;
@@ -319,7 +316,6 @@ JsMain.__onData = function(args) {
 JsMain.callFlashSync = function(err,data,callBackObj) {
 	JsMain.cnx = ExternalConnectionAsync.flashConnect("default","myFlashObject",JsMain.ctx);
 	JsMain.cnx.resolve("main").resolve("onData").call([err,data,callBackObj]);
-	console.log("async" + Std.string(callBackObj));
 }
 var List = function() {
 	this.length = 0;

@@ -74,7 +74,7 @@ class ExternalConnectionAsync implements Connection implements Dynamic<Connectio
 		
 		
 		sn += 1;
-		trace("sn=" + sn);
+		
 		#if flash
 		 var callBackF = params.pop();
 		 var p:CallBackObj = params[params.length - 1];

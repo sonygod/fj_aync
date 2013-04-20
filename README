@@ -1,6 +1,6 @@
-This file was created by IntelliJ IDEA (Leda) IU-129.60 for binding GitHub repository
- haxe flash js remoting use async flash---async ---js js----async--flash this version only work on firefox,
-I don't know why ,maybe haxe Timer ge tsomthing wrong. try to build this ,you need tinkerbell r6388 , hx-async
-fixed:    only work on firefox
-cause some trace code at ExternalConnection will let haxe.Unserializer get error! good
+current version 0.1
+useage:
+	 hello = new Forwarder(cnx, "hello", HelloService.getInstance());
+
+       hello.sayHello("hi", "god", onCalljs);
 
