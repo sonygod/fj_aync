@@ -19,7 +19,7 @@ class Forwarder implements Cls implements IHelloServer {
     public function new(target:ExternalConnectionAsync,name:String,callBackClass:Dynamic) {
 
         this.target=target;
-        target.getcallBackList().set(name, {id:name,name:"",callBack:callBackClass});
+        target.getcallBackList().set(name, {id:name,name:"",sn:"",callBack:callBackClass});
 
     }
 }

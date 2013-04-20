@@ -38,6 +38,7 @@ class ExternalConnectionAsync implements Connection implements Dynamic<Connectio
 
 	var __data : { name : String, ctx : Context, #if js flash : String #end };
 	var __path : Array<String>;
+	var sn:Int;
 
 	function new( data, path ) {
 		__data = data;
@@ -72,10 +73,13 @@ class ExternalConnectionAsync implements Connection implements Dynamic<Connectio
 	public function call( params : Array<Dynamic> ) : Dynamic {
 		
 		
+		sn += 1;
+		trace("sn=" + sn);
 		#if flash
 		 var callBackF = params.pop();
 		 var p:CallBackObj = params[params.length - 1];
-		 callBackList.set(p.id + p.name, { id:p.id, name:p.name, callBack:callBackF } );
+		 p.sn = sn+"";
+		 callBackList.set(p.id + p.name+sn, { id:p.id, name:p.name, callBack:callBackF,sn:sn+"" } );
 		 #end
 		 
 		

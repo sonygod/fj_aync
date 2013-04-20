@@ -44,10 +44,12 @@ class FlashMain {
 
 
         var callBackObj:CallBackObj = args.pop();
+		trace(callBackObj.id + "" + callBackObj.name + "" + callBackObj.sn);
         var classObject:CallBackObjWithFun = cnx.getcallBackList().get(callBackObj.id + "");
-        var method:CallBackObjWithFun = cnx.getcallBackList().get(callBackObj.id + callBackObj.name);
+        var method:CallBackObjWithFun = cnx.getcallBackList().get(callBackObj.id + callBackObj.name + callBackObj.sn);
+		trace("method" + method);
         var classCallback:Dynamic = classObject.callBack;
-
+trace("classCallback" + classCallback);
       
         try {
 

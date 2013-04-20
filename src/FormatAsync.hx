@@ -7,6 +7,8 @@ package ;
 typedef CallBackObj = {
     id:String,
 	name:String,
+	?sn:String,
+
 	
 }
 typedef CallBackObjWithFun = {
