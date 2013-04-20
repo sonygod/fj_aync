@@ -24,7 +24,8 @@ class JsMain {
        
 	   cnx = ExternalConnectionAsync.flashConnect("default", "myFlashObject", ctx);
 	   //register module 
-	   hello=new Forwarder(cnx,"hello",HelloService.getInstance());
+	   hello = new Forwarder(cnx, "hello", HelloService.getInstance());
+	   trace("main---");
 	  
 	    }
 	
@@ -36,7 +37,8 @@ class JsMain {
 	        //get callBackObject
 		    var callBackObj :CallBackObj = args.pop();
 			//add callBack function to args
-			args.push(callFlashSync);
+			trace("callBackObj" + callBackObj);
+			args.push({cbF:callFlashSync,obj:callBackObj});
 	         //get current platform class
 			var callBackObjWithFun:CallBackObjWithFun = cnx.getcallBackList().get(callBackObj.id+"");
 
@@ -57,7 +59,8 @@ class JsMain {
 		public static function callFlashSync(err, data,callBackObj:CallBackObj):Void {
            //don't know why much defined again, if no ,it will error 
             cnx = ExternalConnectionAsync.flashConnect("default", "myFlashObject", ctx);
-            cnx.main.onData.call([err,data,callBackObj]);
+            cnx.main.onData.call([err, data, callBackObj]);
+			trace("async"+callBackObj);
 		   
 		 
 			   
