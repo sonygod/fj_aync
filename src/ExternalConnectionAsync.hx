@@ -38,7 +38,7 @@ class ExternalConnectionAsync implements Connection implements Dynamic<Connectio
 
 	var __data : { name : String, ctx : Context, #if js flash : String #end };
 	var __path : Array<String>;
-	var sn:Int;
+	public static var  sn:Int=0;
 
 	function new( data, path ) {
 		__data = data;

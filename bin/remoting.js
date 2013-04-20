@@ -73,6 +73,8 @@ ExternalConnectionAsync.prototype = {
 		return ExternalConnectionAsync.callBackList;
 	}
 	,call: function(params) {
+		ExternalConnectionAsync.sn += 1;
+		console.log("sn=" + ExternalConnectionAsync.sn);
 		var s = new haxe.Serializer();
 		s.serialize(params);
 		var params1 = s.toString();
@@ -122,7 +124,7 @@ tink.lang.Cls.__name__ = ["tink","lang","Cls"];
 var Forwarder = function(target,name,callBackClass) {
 	this.fields = new haxe.ds.StringMap();
 	this.target = target;
-	target.getcallBackList().set(name,{ id : name, name : "", callBack : callBackClass});
+	target.getcallBackList().set(name,{ id : name, name : "", sn : "", callBack : callBackClass});
 };
 $hxClasses["Forwarder"] = Forwarder;
 Forwarder.__name__ = ["Forwarder"];
@@ -168,12 +170,11 @@ HelloService.getInstance = function() {
 }
 HelloService.prototype = {
 	sayHello: function(x,y,cb) {
-		var _g = this;
 		var platform;
 		x += ":js";
 		platform = "js";
-		Test.main(function(err,data) {
-			cb(null,data,{ id : _g.name, name : "sayHello"});
+		Test.main2(function(err,data) {
+			cb.cbF(null,data,cb.obj);
 		});
 	}
 	,__class__: HelloService
@@ -299,10 +300,12 @@ JsMain.main = function() {
 	JsMain.ctx.addObject("main",JsMain);
 	JsMain.cnx = ExternalConnectionAsync.flashConnect("default","myFlashObject",JsMain.ctx);
 	JsMain.hello = new Forwarder(JsMain.cnx,"hello",HelloService.getInstance());
+	console.log("main---");
 }
 JsMain.__onData = function(args) {
 	var callBackObj = args.pop();
-	args.push(JsMain.callFlashSync);
+	console.log("callBackObj" + Std.string(callBackObj));
+	args.push({ cbF : JsMain.callFlashSync, obj : callBackObj});
 	var callBackObjWithFun = JsMain.cnx.getcallBackList().get(callBackObj.id + "");
 	var classCallback = callBackObjWithFun.callBack;
 	try {
@@ -316,6 +319,7 @@ JsMain.__onData = function(args) {
 JsMain.callFlashSync = function(err,data,callBackObj) {
 	JsMain.cnx = ExternalConnectionAsync.flashConnect("default","myFlashObject",JsMain.ctx);
 	JsMain.cnx.resolve("main").resolve("onData").call([err,data,callBackObj]);
+	console.log("async" + Std.string(callBackObj));
 }
 var List = function() {
 	this.length = 0;
@@ -483,6 +487,51 @@ Test.main = function(callBack2) {
 	},function(err,args) {
 		callBack2(err,args);
 	}]);
+}
+Test.main2 = function(__cb) {
+	Test.bubblesort([2,1,4,7],function(__e,arrayData) {
+		if(__e == null) {
+			var a = null, b = null, c = null, __parallelCounter0 = 3;
+			var __afterParallel1 = function(__e1) {
+				if(__e1 == null) {
+					if(--__parallelCounter0 == 0) {
+						var arr = [null,null,null];
+						Test.doFooGroup("group1",function(__e2,__5) {
+							if(__e2 == null) {
+								arr[0] = __5;
+								Test.doFooGroup("group2",function(__e3,__6) {
+									if(__e3 == null) {
+										arr[1] = __6;
+										Test.doFooGroup("group3",function(__e4,__7) {
+											if(__e4 == null) {
+												arr[2] = __7;
+												__cb(null,arr);
+											} else __cb(__e4,null);
+										});
+									} else __cb(__e3,null);
+								});
+							} else __cb(__e2,null);
+						});
+					}
+				} else if(__parallelCounter0 >= 0) {
+					__parallelCounter0 = -1;
+					__cb(__e1,null);
+				}
+			};
+			Test.doFooParallel(arrayData,function(__e1,__a2) {
+				a = __a2;
+				__afterParallel1(__e1);
+			});
+			Test.doFooParallel(arrayData,function(__e1,__b3) {
+				b = __b3;
+				__afterParallel1(__e1);
+			});
+			Test.doFooParallel(arrayData,function(__e1,__c4) {
+				c = __c4;
+				__afterParallel1(__e1);
+			});
+		} else __cb(__e,null);
+	});
 }
 Test.delay = function(ms,cb) {
 	haxe.Timer.delay(function() {
@@ -1549,9 +1598,10 @@ var Bool = $hxClasses.Bool = Boolean;
 Bool.__ename__ = ["Bool"];
 var Class = $hxClasses.Class = { __name__ : ["Class"]};
 var Enum = { };
+ExternalConnectionAsync.sn = 0;
 ExternalConnectionAsync.connections = new haxe.ds.StringMap();
 ExternalConnectionAsync.callBackList = new haxe.ds.StringMap();
-Test.__meta__ = { statics : { bubblesort : { async : null}, asynchronous : { async : null}, doFooParallel : { async : null}, doFooGroup : { async : null}, doSomethingElseAsync : { async : null}, doSomethingElseAsync2 : { async : null}, doSomethingElseAsync3 : { async : null}}};
+Test.__meta__ = { statics : { bubblesort : { async : null}, asynchronous : { async : null}, doFooParallel : { async : null}, doFooGroup : { async : null}, doSomethingElseAsync : { async : null}, doSomethingElseAsync2 : { async : null}, doSomethingElseAsync3 : { async : null}, main2 : { async : null}}};
 haxe.Serializer.USE_CACHE = false;
 haxe.Serializer.USE_ENUM_INDEX = false;
 haxe.Serializer.BASE64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%:";
