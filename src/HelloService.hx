@@ -9,7 +9,7 @@ package ;
 import haxe.remoting.Context;
 import haxe.remoting.ExternalConnection;
 import FormatAsync;
-import org.transition9.async.Step;
+
 class HelloService implements IHelloServer{
 
    public var name:String="hello";

@@ -8,8 +8,8 @@ package ;
 import async.Build;
 import async.Async;
 import haxe.Timer;
-import org.transition9.async.Step;
-using org.transition9.async.AsyncLambda;
+
+
 class Test implements Build
 {
 
@@ -119,7 +119,7 @@ class Test implements Build
 		 
 		 
 		
-          var step = new Step();
+        /*  var step = new Step();
 		  step.chain([
 		  
 		       function () {
@@ -144,7 +144,7 @@ class Test implements Build
 					   callBack2(err, args);
 				  }
 		  
-		  ]);
+		  ]);*/
 		   
         
 	

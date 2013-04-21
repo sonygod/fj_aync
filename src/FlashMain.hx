@@ -43,25 +43,7 @@ class FlashMain {
     public static function __onData(args:Array<Dynamic>) {
 
 
-        var callBackObj:CallBackObj = args.pop();
-		trace(callBackObj.id + "" + callBackObj.name + "" + callBackObj.sn);
-        var classObject:CallBackObjWithFun = cnx.getcallBackList().get(callBackObj.id + "");
-        var method:CallBackObjWithFun = cnx.getcallBackList().get(callBackObj.id + callBackObj.name + callBackObj.sn);
-		//trace("method" + method);
-        var classCallback:Dynamic = classObject.callBack;
-//trace("classCallback" + classCallback);
-      
-        try {
-
-          /*  trace("classCallback"+classCallback);
-            trace("method"+method.callBack);
-            trace("args"+args);*/
-            Reflect.callMethod(classCallback, method.callBack, args);
-        } catch (e:Dynamic) {
-            trace(e);
-            return ;
-        }
-        return ;
+         cnx.__onData(args);
 
 
     }

@@ -174,7 +174,34 @@ class ExternalConnectionAsync implements Connection implements Dynamic<Connectio
 	}
 
 	#end
+     
+	
+	  public  function __onData(args:Array<Dynamic>) {
 
+
+		  
+        var callBackObj:CallBackObj = args.pop();
+		trace(callBackObj.id + "" + callBackObj.name + "" + callBackObj.sn);
+        var classObject:CallBackObjWithFun = getcallBackList().get(callBackObj.id + "");
+        var method:CallBackObjWithFun = getcallBackList().get(callBackObj.id + callBackObj.name + callBackObj.sn);
+		
+        var classCallback:Dynamic = classObject.callBack;
+
+      
+        try {
+
+      
+            Reflect.callMethod(classCallback, method.callBack, args);
+			getcallBackList().remove(callBackObj.id + callBackObj.name + callBackObj.sn);
+			
+        } catch (e:Dynamic) {
+            trace(e);
+            return ;
+        }
+        return ;
+
+
+    }
 }
 
 

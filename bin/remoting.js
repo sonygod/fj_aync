@@ -69,7 +69,22 @@ ExternalConnectionAsync.flashConnect = function(name,flashObjectID,ctx) {
 	return cnx;
 }
 ExternalConnectionAsync.prototype = {
-	getcallBackList: function() {
+	__onData: function(args) {
+		var callBackObj = args.pop();
+		console.log(callBackObj.id + "" + callBackObj.name + "" + callBackObj.sn);
+		var classObject = this.getcallBackList().get(callBackObj.id + "");
+		var method = this.getcallBackList().get(callBackObj.id + callBackObj.name + callBackObj.sn);
+		var classCallback = classObject.callBack;
+		try {
+			method.callBack.apply(classCallback,args);
+			this.getcallBackList().remove(callBackObj.id + callBackObj.name + callBackObj.sn);
+		} catch( e ) {
+			console.log(e);
+			return;
+		}
+		return;
+	}
+	,getcallBackList: function() {
 		return ExternalConnectionAsync.callBackList;
 	}
 	,call: function(params) {
@@ -142,6 +157,9 @@ Forwarder.prototype = {
 	}
 	,get_name: function() {
 		return this.fields.get("name");
+	}
+	,__onData: function(args) {
+		return this.target.__onData(args);
 	}
 	,getcallBackList: function() {
 		return this.target.getcallBackList();
@@ -469,20 +487,6 @@ Test.doSomethingElseAsync3 = function(element,__cb) {
 	__cb(null,element,"1");
 }
 Test.main = function(callBack2) {
-	var step = new org.transition9.async.Step();
-	step.chain([function() {
-		Test.bubblesort([2,1,4,7],$bind(step,step.cb));
-	},function(err,arrayData) {
-		Test.doFooParallel(arrayData,step.parallel());
-		Test.doFooParallel(arrayData,step.parallel());
-		Test.doFooParallel(arrayData,step.parallel());
-	},function(err,arg1,arg2,arg3) {
-		Test.doFooGroup("group1",step.group());
-		Test.doFooGroup("group1",step.group());
-		Test.doFooGroup("group1",step.group());
-	},function(err,args) {
-		callBack2(err,args);
-	}]);
 }
 Test.main2 = function(__cb) {
 	Test.bubblesort([2,1,4,7],function(__e,arrayData) {
@@ -1429,145 +1433,6 @@ js.Boot.__instanceof = function(o,cl) {
 js.Browser = function() { }
 $hxClasses["js.Browser"] = js.Browser;
 js.Browser.__name__ = ["js","Browser"];
-var org = {}
-org.transition9 = {}
-org.transition9.async = {}
-org.transition9.async.AsyncLambda = function() { }
-$hxClasses["org.transition9.async.AsyncLambda"] = org.transition9.async.AsyncLambda;
-org.transition9.async.AsyncLambda.__name__ = ["org","transition9","async","AsyncLambda"];
-org.transition9.async.AsyncLambda.iter = function(it,f,onFinish) {
-	var iterator = $iterator(it)();
-	var asyncCall = null;
-	asyncCall = function() {
-		if(iterator.hasNext()) try {
-			f(iterator.next(),asyncCall);
-		} catch( err ) {
-			onFinish(err);
-		} else onFinish(null);
-	};
-	asyncCall();
-}
-org.transition9.async.AsyncLambda.map = function(it,f,onFinish) {
-	var mappedElements = [];
-	var iterator = $iterator(it)();
-	var asyncCall = null;
-	asyncCall = function() {
-		if(iterator.hasNext()) try {
-			f(iterator.next(),function(b) {
-				mappedElements.push(b);
-				asyncCall();
-			});
-		} catch( err ) {
-			onFinish(err,null);
-		} else onFinish(null,mappedElements);
-	};
-	asyncCall();
-}
-org.transition9.async.Step = function() {
-	this._chain = [];
-	this._callId = -1;
-};
-$hxClasses["org.transition9.async.Step"] = org.transition9.async.Step;
-org.transition9.async.Step.__name__ = ["org","transition9","async","Step"];
-org.transition9.async.Step.prototype = {
-	callNext: function(args) {
-		this._callId++;
-		if(this._groupedCall != null) {
-			this._groupedCall.shutdown();
-			this._groupedCall = null;
-		}
-		try {
-			this._chain.shift().apply(null,args);
-		} catch( e ) {
-			console.log("Step caught exception: " + Std.string(e));
-			if(this._chain != null && this._chain.length > 0) this.callNext([e,null]); else throw e;
-		}
-	}
-	,createCallback: function(isParallel) {
-		if(this._groupedCall == null) this._groupedCall = new org.transition9.async.GroupedCall(this._callId,isParallel,$bind(this,this.callNext)); else null;
-		return this._groupedCall.createCallback();
-	}
-	,handleError: function(err) {
-		this.callNext([err,null]);
-	}
-	,group: function() {
-		return this.createCallback(false);
-	}
-	,parallel: function() {
-		return this.createCallback(true);
-	}
-	,cb0: function() {
-		this.cb(null,null);
-	}
-	,cb1: function(result) {
-		this.cb(null,result);
-	}
-	,cb: function(err,result) {
-		this.callNext([err,err == null?result:null]);
-	}
-	,chain: function(arr) {
-		var _g = 0;
-		while(_g < arr.length) {
-			var f = arr[_g];
-			++_g;
-			this._chain.push(f);
-		}
-		this.callNext([]);
-	}
-	,__class__: org.transition9.async.Step
-}
-org.transition9.async.GroupedCall = function(callId,isParallel,callNext) {
-	this.callId = callId;
-	this.isParallel = isParallel;
-	this._groupedFunctionIndex = this._pending = 0;
-	this._pendingResults = [];
-	this.callNext = callNext;
-};
-$hxClasses["org.transition9.async.GroupedCall"] = org.transition9.async.GroupedCall;
-org.transition9.async.GroupedCall.__name__ = ["org","transition9","async","GroupedCall"];
-org.transition9.async.GroupedCall.prototype = {
-	calledGroupCallback: function() {
-		if(this._pending == 0 && !this.finished) {
-			this.finished = true;
-			if(this.isParallel) {
-				this._pendingResults.unshift(this._err);
-				this.callNext(this._pendingResults);
-			} else this.callNext(this._err == null?[null,this._pendingResults]:[this._err,null]);
-		}
-	}
-	,platformDelay: function(ms,fun) {
-		haxe.Timer.delay(fun,ms);
-	}
-	,delay: function(ms,cb) {
-		haxe.Timer.delay(function() {
-			console.log(ms + " passed");
-			cb(null);
-		},ms);
-	}
-	,createCallback: function() {
-		var _g = this;
-		var index = this._groupedFunctionIndex++;
-		this._pending++;
-		return function(err,result) {
-			_g._pending--;
-			if(_g.finished) return;
-			if(err != null || _g._err != null) {
-				_g._pendingResults[index] = null;
-				if(_g._err == null) _g._err = err;
-			} else _g._pendingResults[index] = result;
-			if(_g._pending == 0) haxe.Timer.delay($bind(_g,_g.calledGroupCallback),0);
-		};
-	}
-	,shutdown: function() {
-		this._pendingResults = null;
-		this.callNext = null;
-		this._err = null;
-	}
-	,__class__: org.transition9.async.GroupedCall
-}
-function $iterator(o) { if( o instanceof Array ) return function() { return HxOverrides.iter(o); }; return typeof(o.iterator) == 'function' ? $bind(o,o.iterator) : o.iterator; };
-var $_;
-function $bind(o,m) { var f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; return f; };
 JsMain.onData = Reflect.makeVarArgs(JsMain.__onData);
 Math.__name__ = ["Math"];
 Math.NaN = Number.NaN;
