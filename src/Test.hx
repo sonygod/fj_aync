@@ -85,18 +85,18 @@ class Test implements Build
 			
 	}
 	
-	 @async(var ret:Bool) public static function doFooParallel(arrayData:Array<Float>) {
+	 @async(var ret:BoolErr ) public static function doFooParallel(arrayData:Array<Float>) {
 		//trace(Timer.stamp() * 10000 + "" + arrayData);
 	return true;
 	};
 	
 	//
-	@async(var ret:Bool) public static function doFooGroup(?arg1:String) {
+	@async(var ret:BoolErr ) public static function doFooGroup(?arg1:String) {
 		//trace(Timer.stamp() * 10000 + "doFooGroup" + arg1);
 	return true;
 	};
 	
-	 @async(var ret:Bool)public static function  doSomethingElseAsync(array) {
+	 @async(var ret:BoolErr )public static function  doSomethingElseAsync(array) {
 		//trace(Timer.stamp() * 10000 + " doSomethingElseAsync" + array);
 	return true;
 	};
@@ -160,9 +160,9 @@ class Test implements Build
 		
 		//paraller
 		[
-		  [var a:Bool] = doFooParallel(arrayData),
-		  [var b:Bool] = doFooParallel(arrayData),
-		  [var c:Bool] = doFooParallel(arrayData),
+		  [var a] = doFooParallel(arrayData),
+		  [var b] = doFooParallel(arrayData),
+		  [var c] = doFooParallel(arrayData),
 		
 		];
 		
@@ -186,3 +186,4 @@ class Test implements Build
 }
 
 typedef NodeErr = Null<String>;
+typedef BoolErr = Null<Bool>;

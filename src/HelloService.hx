@@ -28,20 +28,13 @@ class HelloService implements IHelloServer{
 
     public function sayHello(x:String, y:String, cb:JsRecall):Void {
 
-		//trace("get sayheloo now");
-		var platform:String;
-		#if flash
-		platform = "flash";
-		 cb.cbF(null,x + y+" platform"+platform,cb.obj);
-		#else
-		x += ":js";
-		platform = "js";
+	
 		
 		
 		
 		Test.main2(function(err, data) { cb.cbF(null, data, cb.obj ); } );
 		
-		#end
+		
        
 
     }

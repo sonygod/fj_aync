@@ -184,7 +184,7 @@ class ExternalConnectionAsync implements Connection implements Dynamic<Connectio
 	  public  function __onData(args:Array<Dynamic>) {
 
 
-		   trace(args+"");
+		 
            //get callBackObject
 		    var callBackObj :CallBackObj =args.pop();
 			//add callBack function to args
@@ -228,12 +228,12 @@ class ExternalConnectionAsync implements Connection implements Dynamic<Connectio
 
     }
 	
-	
+	//derect call 
 	public  static function callFlashSync(err, data,callBackObj:CallBackObj):Void {
          
             callBackObj.needRecall = false;
             ExternalConnectionAsync.instance.main.onData.call([err, data, callBackObj]);
-			trace("js?return?");
+		
 		   
 		 
 			   

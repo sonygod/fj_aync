@@ -24,9 +24,9 @@ ExternalConnectionAsync.instance = cnx;
         var arr2 = arr.slice(0, arr.length - 1);
         hello = new Forwarder(cnx, "hello", HelloService.getInstance());
 
-      //  hello.sayHello("hi", "god", onCalljs);
+       hello.sayHello("hi", "god", onCalljs);
 
-     //   hello.sayHello("hi", "god2", onCalljs2);
+     hello.sayHello("hi", "god2", onCalljs2);
 
     }
 
