@@ -326,11 +326,8 @@ JsMain.main = function() {
 	JsMain.hello = new Forwarder(JsMain.cnx,"hello",HelloService.getInstance());
 }
 JsMain.__onData = function(args) {
-	console.log(args);
-	var callBackObj = args[args.length - 1];
-	if(callBackObj.needRecall == true) {
-		callBackObj = args.pop();
-		args.push({ cbF : JsMain.callFlashSync, obj : callBackObj});
+	var callBackObj = args.pop();
+	if(callBackObj.needRecall == true) args.push({ cbF : JsMain.callFlashSync, obj : callBackObj}); else {
 	}
 	var classObject = ExternalConnectionAsync.instance.getcallBackList().get(callBackObj.id + "");
 	var method = ExternalConnectionAsync.instance.getcallBackList().get(callBackObj.id + callBackObj.name + callBackObj.sn);
