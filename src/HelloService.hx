@@ -32,7 +32,12 @@ class HelloService implements IHelloServer{
 		
 		
 		
-		Test.main2(function(err, data) { cb.cbF(null, data, cb.obj ); } );
+		Test.main2(
+		function(err, data) 
+{ cb.cbF(null, data, cb.obj ); 
+    data = null;
+	cb = null;
+} );
 		
 		
        

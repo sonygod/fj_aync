@@ -71,6 +71,7 @@ ExternalConnectionAsync.flashConnect = function(name,flashObjectID,ctx) {
 ExternalConnectionAsync.callFlashSync = function(err,data,callBackObj) {
 	callBackObj.needRecall = false;
 	ExternalConnectionAsync.instance.resolve("main").resolve("onData").call([err,data,callBackObj]);
+	callBackObj = null;
 }
 ExternalConnectionAsync.prototype = {
 	__onData: function(args) {
@@ -86,14 +87,19 @@ ExternalConnectionAsync.prototype = {
 			theCallMethod.apply(classCallback,args);
 		} catch( e ) {
 			console.log(e);
-			return;
 		}
+		this.getcallBackList().remove(callBackObj.id + callBackObj.name + callBackObj.sn);
+		classCallback = null;
+		method = null;
+		classObject = null;
+		theCallMethod = null;
 		return;
 	}
 	,getcallBackList: function() {
 		return ExternalConnectionAsync.callBackList;
 	}
 	,call: function(params) {
+		if(ExternalConnectionAsync.sn > 10000) ExternalConnectionAsync.sn = 1;
 		ExternalConnectionAsync.sn += 1;
 		if(Reflect.isFunction(params[params.length - 1])) {
 			var callBackF = params.pop();
@@ -101,6 +107,7 @@ ExternalConnectionAsync.prototype = {
 			p.sn = ExternalConnectionAsync.sn + "";
 			ExternalConnectionAsync.callBackList.set(p.id + p.name + ExternalConnectionAsync.sn,{ id : p.id, name : p.name, callBack : callBackF, sn : ExternalConnectionAsync.sn + ""});
 			p.needRecall = true;
+			callBackF = null;
 		}
 		var s = new haxe.Serializer();
 		s.serialize(params);
@@ -200,11 +207,10 @@ HelloService.getInstance = function() {
 }
 HelloService.prototype = {
 	sayHello: function(x,y,cb) {
-		var platform;
-		x += ":js";
-		platform = "js";
 		Test.main2(function(err,data) {
 			cb.cbF(null,data,cb.obj);
+			data = null;
+			cb = null;
 		});
 	}
 	,__class__: HelloService
@@ -331,20 +337,21 @@ JsMain.main = function() {
 	JsMain.cnx = ExternalConnectionAsync.flashConnect("default","myFlashObject",JsMain.ctx);
 	ExternalConnectionAsync.instance = JsMain.cnx;
 	JsMain.hello = new Forwarder(JsMain.cnx,"hello",HelloService.getInstance());
-	haxe.Timer.delay(JsMain.test1,5000);
+	haxe.Timer.delay(JsMain.test1,3000);
 }
 JsMain.test1 = function() {
-	console.log("test1");
-	JsMain.hello.sayHello("hi","god js call flash",JsMain.onCalljs);
+	JsMain.hello.sayHello("hi","god js call flash" + Math.random() * 1000,JsMain.onCalljs);
+	setInterval(JsMain.timeCall,100);
+}
+JsMain.timeCall = function() {
+	JsMain.hello.sayHello("hi","god2" + Math.random() * 1000,JsMain.onCalljs2);
 }
 JsMain.__onData = function(args) {
 	JsMain.cnx.__onData(args);
 }
 JsMain.onCalljs = function(err,data) {
-	console.log("async come back " + data);
 }
 JsMain.onCalljs2 = function(err,data) {
-	console.log("2async come back " + data);
 }
 var List = function() {
 	this.length = 0;
@@ -1494,3 +1501,5 @@ function $hxExpose(src, path) {
 	o[parts[parts.length-1]] = src;
 }
 })();
+
+//@ sourceMappingURL=remoting.js.map

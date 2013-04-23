@@ -75,6 +75,9 @@ class ExternalConnectionAsync implements Connection implements Dynamic<Connectio
 	public function call( params : Array<Dynamic> ) : Dynamic {
 		
 		
+		if (sn > 10000) {
+			sn = 1;
+		}
 		sn += 1;
 		
 		//if last params is function .
@@ -85,6 +88,7 @@ class ExternalConnectionAsync implements Connection implements Dynamic<Connectio
 		 p.sn = sn+"";
 		 callBackList.set(p.id + p.name + sn, { id:p.id, name:p.name, callBack:callBackF, sn:sn + "" } );
 		 p.needRecall = true;
+		 callBackF = null;
 		}
 		 
 		
@@ -218,11 +222,19 @@ class ExternalConnectionAsync implements Connection implements Dynamic<Connectio
 			//classCallback.callMethod(theCallMethod, args);
 			Reflect.callMethod(classCallback, theCallMethod, args);
 			
+			
+			
 			}catch (e:Dynamic) {
 				trace(e);
-				return ;
+				
 				
 			}
+			getcallBackList().remove(callBackObj.id + callBackObj.name + callBackObj.sn);
+			classCallback = null;
+			method = null;
+			classObject = null;
+			theCallMethod = null;
+			
 			return ;
 
 
@@ -235,7 +247,7 @@ class ExternalConnectionAsync implements Connection implements Dynamic<Connectio
             ExternalConnectionAsync.instance.main.onData.call([err, data, callBackObj]);
 		
 		   
-		 
+		 callBackObj = null;
 			   
 		}
 	

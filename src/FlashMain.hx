@@ -19,25 +19,30 @@ class FlashMain {
         ctx.addObject("main", FlashMain);
 
         cnx = ExternalConnectionAsync.jsConnect("default", ctx);
-ExternalConnectionAsync.instance = cnx;
+        ExternalConnectionAsync.instance = cnx;
         var arr:Array<Int> = [1, 2];
         var arr2 = arr.slice(0, arr.length - 1);
         hello = new Forwarder(cnx, "hello", HelloService.getInstance());
 
-       hello.sayHello("hi", "god", onCalljs);
+        hello.sayHello("hi", "god", onCalljs);
 
-     hello.sayHello("hi", "god2", onCalljs2);
+        hello.sayHello("hi", "god2", onCalljs2);
+	 
+	
+	 
 
     }
+	
+	
 
-    public static function onCalljs(err, data):Void {
+    public static function onCalljs(err, data ,?other):Void {
 
-        trace("async come back " + data);
+        trace("async come back "+Math.random()*1000 + data);
     }
 
     public static function onCalljs2(err, data):Void {
 
-        trace("2async come back " + data);
+        trace("2async come back "+Math.random()*1000 + data);
     }
 
     public static function __onData(args:Array<Dynamic>) {
