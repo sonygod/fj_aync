@@ -316,15 +316,19 @@ JsMain.main = function() {
 	JsMain.ctx = new haxe.remoting.Context();
 	JsMain.ctx.addObject("main",JsMain);
 	JsMain.cnx = ExternalConnectionAsync.flashConnect("default","myFlashObject",JsMain.ctx);
+	ExternalConnectionAsync.instance = JsMain.cnx;
 	JsMain.hello = new Forwarder(JsMain.cnx,"hello",HelloService.getInstance());
 }
 JsMain.__onData = function(args) {
 	var callBackObj = args.pop();
 	args.push({ cbF : JsMain.callFlashSync, obj : callBackObj});
-	var callBackObjWithFun = JsMain.cnx.getcallBackList().get(callBackObj.id + "");
-	var classCallback = callBackObjWithFun.callBack;
+	var classObject = ExternalConnectionAsync.instance.getcallBackList().get(callBackObj.id + "");
+	var method = ExternalConnectionAsync.instance.getcallBackList().get(callBackObj.id + callBackObj.name + callBackObj.sn);
+	var classCallback = classObject.callBack;
+	var theCallMethod;
+	if(method != null) theCallMethod = method.callBack; else theCallMethod = Reflect.field(classCallback,callBackObj.name);
 	try {
-		Reflect.field(classCallback,callBackObj.name).apply(classCallback,args);
+		theCallMethod.apply(classCallback,args);
 	} catch( e ) {
 		console.log(e);
 		return;
@@ -332,8 +336,7 @@ JsMain.__onData = function(args) {
 	return;
 }
 JsMain.callFlashSync = function(err,data,callBackObj) {
-	JsMain.cnx = ExternalConnectionAsync.flashConnect("default","myFlashObject",JsMain.ctx);
-	JsMain.cnx.resolve("main").resolve("onData").call([err,data,callBackObj]);
+	ExternalConnectionAsync.instance.resolve("main").resolve("onData").call([err,data,callBackObj]);
 }
 var List = function() {
 	this.length = 0;
@@ -1483,3 +1486,5 @@ function $hxExpose(src, path) {
 	o[parts[parts.length-1]] = src;
 }
 })();
+
+//@ sourceMappingURL=remoting.js.map

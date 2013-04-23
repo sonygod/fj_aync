@@ -24,6 +24,8 @@ class JsMain {
        
 	   cnx = ExternalConnectionAsync.flashConnect("default", "myFlashObject", ctx);
 	   //register module 
+	 
+	   ExternalConnectionAsync.instance = cnx;
 	   hello = new Forwarder(cnx, "hello", HelloService.getInstance());
 	  // trace("main---");
 	  
@@ -40,27 +42,38 @@ class JsMain {
 			//trace("callBackObj" + callBackObj);
 			args.push({cbF:callFlashSync,obj:callBackObj});
 	         //get current platform class
-			var callBackObjWithFun:CallBackObjWithFun = cnx.getcallBackList().get(callBackObj.id+"");
-
-           
-			var classCallback :Dynamic= callBackObjWithFun.callBack;
-		
-			try{
-			classCallback.callMethod(classCallback.field(callBackObj.name), args);
+			var classObject:CallBackObjWithFun = ExternalConnectionAsync.instance.getcallBackList().get(callBackObj.id+"");
+            var method:CallBackObjWithFun = ExternalConnectionAsync.instance.getcallBackList().get(callBackObj.id + callBackObj.name + callBackObj.sn);
+			
+			var classCallback :Dynamic = classObject.callBack;
+			var theCallMethod:Dynamic;
+			if (method != null) {
+				
+				theCallMethod = method.callBack;
+			}else {
+				theCallMethod= classCallback.field(callBackObj.name);
+			}
+         
+			
+		   
+			try {
+				
+			classCallback.callMethod(theCallMethod, args);
 			
 			}catch (e:Dynamic) {
 				trace(e);
 				return ;
+				
 			}
 			return ;
 			
 		}
 		
 		public static function callFlashSync(err, data,callBackObj:CallBackObj):Void {
-           //don't know why much defined again, if no ,it will error 
-            cnx = ExternalConnectionAsync.flashConnect("default", "myFlashObject", ctx);
-            cnx.main.onData.call([err, data, callBackObj]);
-			//trace("async"+callBackObj);
+         
+           
+            ExternalConnectionAsync.instance.main.onData.call([err, data, callBackObj]);
+			
 		   
 		 
 			   

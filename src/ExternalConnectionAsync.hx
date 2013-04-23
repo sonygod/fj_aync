@@ -27,6 +27,7 @@ import FormatAsync;
 import haxe.remoting.Connection;
 import haxe.remoting.Context;
 import IECAsync;
+using Reflect;
 
 
 
@@ -38,7 +39,8 @@ class ExternalConnectionAsync implements Connection implements Dynamic<Connectio
 
 	var __data : { name : String, ctx : Context, #if js flash : String #end };
 	var __path : Array<String>;
-	public static var  sn:Int=0;
+	public static var  sn:Int = 0;
+	public static var instance:ExternalConnectionAsync;
 
 	function new( data, path ) {
 		__data = data;
@@ -181,7 +183,7 @@ class ExternalConnectionAsync implements Connection implements Dynamic<Connectio
 
 		  
         var callBackObj:CallBackObj = args.pop();
-		trace(callBackObj.id + "" + callBackObj.name + "" + callBackObj.sn);
+		
         var classObject:CallBackObjWithFun = getcallBackList().get(callBackObj.id + "");
         var method:CallBackObjWithFun = getcallBackList().get(callBackObj.id + callBackObj.name + callBackObj.sn);
 		
@@ -191,7 +193,8 @@ class ExternalConnectionAsync implements Connection implements Dynamic<Connectio
         try {
 
       
-            Reflect.callMethod(classCallback, method.callBack, args);
+           // Reflect.callMethod(classCallback, method.callBack, args);
+		    classCallback.callMethod(method.callBack, args);
 			getcallBackList().remove(callBackObj.id + callBackObj.name + callBackObj.sn);
 			
         } catch (e:Dynamic) {
@@ -202,6 +205,8 @@ class ExternalConnectionAsync implements Connection implements Dynamic<Connectio
 
 
     }
+	
+	
 }
 
 
