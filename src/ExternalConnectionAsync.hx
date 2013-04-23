@@ -185,29 +185,56 @@ class ExternalConnectionAsync implements Connection implements Dynamic<Connectio
 
 
 		  
-        var callBackObj:CallBackObj = args.pop();
+           //get callBackObject
+		    var callBackObj :CallBackObj =args.pop();
+			//add callBack function to args
 		
-        var classObject:CallBackObjWithFun = getcallBackList().get(callBackObj.id + "");
-        var method:CallBackObjWithFun = getcallBackList().get(callBackObj.id + callBackObj.name + callBackObj.sn);
-		
-        var classCallback:Dynamic = classObject.callBack;
-
-      
-        try {
-
-      
-           // Reflect.callMethod(classCallback, method.callBack, args);
-		    classCallback.callMethod(method.callBack, args);
-			getcallBackList().remove(callBackObj.id + callBackObj.name + callBackObj.sn);
+			if (callBackObj.needRecall==true) {
+				
+				 args.push({cbF:callFlashSync,obj:callBackObj});
+			}else {
+				
+			}
 			
-        } catch (e:Dynamic) {
-            trace(e);
-            return ;
-        }
-        return ;
+	         //get current platform class
+			var classObject:CallBackObjWithFun = getcallBackList().get(callBackObj.id+"");
+            var method:CallBackObjWithFun = getcallBackList().get(callBackObj.id + callBackObj.name + callBackObj.sn);
+			
+			var classCallback :Dynamic = classObject.callBack;
+			var theCallMethod:Dynamic;
+			if (method != null) {
+				
+				theCallMethod = method.callBack;
+			}else {
+				theCallMethod= classCallback.field(callBackObj.name);
+			}
+         
+			
+		   
+			try {
+				
+			classCallback.callMethod(theCallMethod, args);
+			
+			}catch (e:Dynamic) {
+				trace(e);
+				return ;
+				
+			}
+			return ;
 
 
     }
+	
+	
+		public  function callFlashSync(err, data,callBackObj:CallBackObj):Void {
+         
+            callBackObj.needRecall = false;
+            ExternalConnectionAsync.instance.main.onData.call([err, data, callBackObj]);
+			
+		   
+		 
+			   
+		}
 	
 	
 }

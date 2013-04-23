@@ -69,14 +69,21 @@ ExternalConnectionAsync.flashConnect = function(name,flashObjectID,ctx) {
 	return cnx;
 }
 ExternalConnectionAsync.prototype = {
-	__onData: function(args) {
+	callFlashSync: function(err,data,callBackObj) {
+		callBackObj.needRecall = false;
+		ExternalConnectionAsync.instance.resolve("main").resolve("onData").call([err,data,callBackObj]);
+	}
+	,__onData: function(args) {
 		var callBackObj = args.pop();
+		if(callBackObj.needRecall == true) args.push({ cbF : $bind(this,this.callFlashSync), obj : callBackObj}); else {
+		}
 		var classObject = this.getcallBackList().get(callBackObj.id + "");
 		var method = this.getcallBackList().get(callBackObj.id + callBackObj.name + callBackObj.sn);
 		var classCallback = classObject.callBack;
+		var theCallMethod;
+		if(method != null) theCallMethod = method.callBack; else theCallMethod = Reflect.field(classCallback,callBackObj.name);
 		try {
-			method.callBack.apply(classCallback,args);
-			this.getcallBackList().remove(callBackObj.id + callBackObj.name + callBackObj.sn);
+			theCallMethod.apply(classCallback,args);
 		} catch( e ) {
 			console.log(e);
 			return;
@@ -163,6 +170,9 @@ Forwarder.prototype = {
 	}
 	,get_name: function() {
 		return this.fields.get("name");
+	}
+	,callFlashSync: function(err,data,callBackObj) {
+		return this.target.callFlashSync(err,data,callBackObj);
 	}
 	,__onData: function(args) {
 		return this.target.__onData(args);
@@ -326,21 +336,7 @@ JsMain.main = function() {
 	JsMain.hello = new Forwarder(JsMain.cnx,"hello",HelloService.getInstance());
 }
 JsMain.__onData = function(args) {
-	var callBackObj = args.pop();
-	if(callBackObj.needRecall == true) args.push({ cbF : JsMain.callFlashSync, obj : callBackObj}); else {
-	}
-	var classObject = ExternalConnectionAsync.instance.getcallBackList().get(callBackObj.id + "");
-	var method = ExternalConnectionAsync.instance.getcallBackList().get(callBackObj.id + callBackObj.name + callBackObj.sn);
-	var classCallback = classObject.callBack;
-	var theCallMethod;
-	if(method != null) theCallMethod = method.callBack; else theCallMethod = Reflect.field(classCallback,callBackObj.name);
-	try {
-		theCallMethod.apply(classCallback,args);
-	} catch( e ) {
-		console.log(e);
-		return;
-	}
-	return;
+	JsMain.cnx.__onData(args);
 }
 JsMain.callFlashSync = function(err,data,callBackObj) {
 	callBackObj.needRecall = false;
@@ -1444,6 +1440,8 @@ js.Boot.__instanceof = function(o,cl) {
 js.Browser = function() { }
 $hxClasses["js.Browser"] = js.Browser;
 js.Browser.__name__ = ["js","Browser"];
+var $_;
+function $bind(o,m) { var f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; return f; };
 JsMain.onData = Reflect.makeVarArgs(JsMain.__onData);
 Math.__name__ = ["Math"];
 Math.NaN = Number.NaN;
@@ -1494,5 +1492,3 @@ function $hxExpose(src, path) {
 	o[parts[parts.length-1]] = src;
 }
 })();
-
-//@ sourceMappingURL=remoting.js.map

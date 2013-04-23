@@ -35,43 +35,8 @@ class JsMain {
      
 			
 			
-		 
-	        //get callBackObject
-		    var callBackObj :CallBackObj =args.pop();
-			//add callBack function to args
-		
-			if (callBackObj.needRecall==true) {
-				
-				 args.push({cbF:callFlashSync,obj:callBackObj});
-			}else {
-				
-			}
-			
-	         //get current platform class
-			var classObject:CallBackObjWithFun = ExternalConnectionAsync.instance.getcallBackList().get(callBackObj.id+"");
-            var method:CallBackObjWithFun = ExternalConnectionAsync.instance.getcallBackList().get(callBackObj.id + callBackObj.name + callBackObj.sn);
-			
-			var classCallback :Dynamic = classObject.callBack;
-			var theCallMethod:Dynamic;
-			if (method != null) {
-				
-				theCallMethod = method.callBack;
-			}else {
-				theCallMethod= classCallback.field(callBackObj.name);
-			}
-         
-			
-		   
-			try {
-				
-			classCallback.callMethod(theCallMethod, args);
-			
-			}catch (e:Dynamic) {
-				trace(e);
-				return ;
-				
-			}
-			return ;
+		  cnx.__onData(args);
+	      
 			
 		}
 		
