@@ -8,7 +8,7 @@ typedef CallBackObj = {
     id:String,
 	name:String,
 	?sn:String,
-
+    ?needRecall:Bool,
 	
 }
 typedef CallBackObjWithFun = {

@@ -77,12 +77,15 @@ class ExternalConnectionAsync implements Connection implements Dynamic<Connectio
 		
 		sn += 1;
 		
-		#if flash
+		//if last params is function .
+		if(Reflect.isFunction(params[params.length - 1])){
 		 var callBackF = params.pop();
+	  
 		 var p:CallBackObj = params[params.length - 1];
 		 p.sn = sn+"";
-		 callBackList.set(p.id + p.name+sn, { id:p.id, name:p.name, callBack:callBackF,sn:sn+"" } );
-		 #end
+		 callBackList.set(p.id + p.name + sn, { id:p.id, name:p.name, callBack:callBackF, sn:sn + "" } );
+		 p.needRecall = true;
+		}
 		 
 		
 	

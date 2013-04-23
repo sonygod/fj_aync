@@ -35,12 +35,15 @@ class JsMain {
      
 			
 			
-		
+		  trace(args);
 	        //get callBackObject
-		    var callBackObj :CallBackObj = args.pop();
+		    var callBackObj :CallBackObj = args[args.length - 1];
 			//add callBack function to args
-			//trace("callBackObj" + callBackObj);
-			args.push({cbF:callFlashSync,obj:callBackObj});
+		
+			if (callBackObj.needRecall==true) {
+				 callBackObj = args.pop();
+				 args.push({cbF:callFlashSync,obj:callBackObj});
+			}
 	         //get current platform class
 			var classObject:CallBackObjWithFun = ExternalConnectionAsync.instance.getcallBackList().get(callBackObj.id+"");
             var method:CallBackObjWithFun = ExternalConnectionAsync.instance.getcallBackList().get(callBackObj.id + callBackObj.name + callBackObj.sn);
@@ -71,7 +74,7 @@ class JsMain {
 		
 		public static function callFlashSync(err, data,callBackObj:CallBackObj):Void {
          
-           
+            callBackObj.needRecall = false;
             ExternalConnectionAsync.instance.main.onData.call([err, data, callBackObj]);
 			
 		   

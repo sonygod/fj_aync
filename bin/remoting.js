@@ -71,7 +71,6 @@ ExternalConnectionAsync.flashConnect = function(name,flashObjectID,ctx) {
 ExternalConnectionAsync.prototype = {
 	__onData: function(args) {
 		var callBackObj = args.pop();
-		console.log(callBackObj.id + "" + callBackObj.name + "" + callBackObj.sn);
 		var classObject = this.getcallBackList().get(callBackObj.id + "");
 		var method = this.getcallBackList().get(callBackObj.id + callBackObj.name + callBackObj.sn);
 		var classCallback = classObject.callBack;
@@ -89,6 +88,13 @@ ExternalConnectionAsync.prototype = {
 	}
 	,call: function(params) {
 		ExternalConnectionAsync.sn += 1;
+		if(Reflect.isFunction(params[params.length - 1])) {
+			var callBackF = params.pop();
+			var p = params[params.length - 1];
+			p.sn = ExternalConnectionAsync.sn + "";
+			ExternalConnectionAsync.callBackList.set(p.id + p.name + ExternalConnectionAsync.sn,{ id : p.id, name : p.name, callBack : callBackF, sn : ExternalConnectionAsync.sn + ""});
+			p.needRecall = true;
+		}
 		var s = new haxe.Serializer();
 		s.serialize(params);
 		var params1 = s.toString();
@@ -320,8 +326,12 @@ JsMain.main = function() {
 	JsMain.hello = new Forwarder(JsMain.cnx,"hello",HelloService.getInstance());
 }
 JsMain.__onData = function(args) {
-	var callBackObj = args.pop();
-	args.push({ cbF : JsMain.callFlashSync, obj : callBackObj});
+	console.log(args);
+	var callBackObj = args[args.length - 1];
+	if(callBackObj.needRecall == true) {
+		callBackObj = args.pop();
+		args.push({ cbF : JsMain.callFlashSync, obj : callBackObj});
+	}
 	var classObject = ExternalConnectionAsync.instance.getcallBackList().get(callBackObj.id + "");
 	var method = ExternalConnectionAsync.instance.getcallBackList().get(callBackObj.id + callBackObj.name + callBackObj.sn);
 	var classCallback = classObject.callBack;
@@ -336,6 +346,7 @@ JsMain.__onData = function(args) {
 	return;
 }
 JsMain.callFlashSync = function(err,data,callBackObj) {
+	callBackObj.needRecall = false;
 	ExternalConnectionAsync.instance.resolve("main").resolve("onData").call([err,data,callBackObj]);
 }
 var List = function() {
