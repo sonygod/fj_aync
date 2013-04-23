@@ -68,14 +68,16 @@ ExternalConnectionAsync.flashConnect = function(name,flashObjectID,ctx) {
 	ExternalConnectionAsync.connections.set(name,cnx);
 	return cnx;
 }
+ExternalConnectionAsync.callFlashSync = function(err,data,callBackObj) {
+	callBackObj.needRecall = false;
+	ExternalConnectionAsync.instance.resolve("main").resolve("onData").call([err,data,callBackObj]);
+	console.log("js?return?");
+}
 ExternalConnectionAsync.prototype = {
-	callFlashSync: function(err,data,callBackObj) {
-		callBackObj.needRecall = false;
-		ExternalConnectionAsync.instance.resolve("main").resolve("onData").call([err,data,callBackObj]);
-	}
-	,__onData: function(args) {
+	__onData: function(args) {
+		console.log(Std.string(args) + "");
 		var callBackObj = args.pop();
-		if(callBackObj.needRecall == true) args.push({ cbF : $bind(this,this.callFlashSync), obj : callBackObj}); else {
+		if(callBackObj.needRecall == true) args.push({ cbF : ExternalConnectionAsync.callFlashSync, obj : callBackObj}); else {
 		}
 		var classObject = this.getcallBackList().get(callBackObj.id + "");
 		var method = this.getcallBackList().get(callBackObj.id + callBackObj.name + callBackObj.sn);
@@ -171,9 +173,6 @@ Forwarder.prototype = {
 	,get_name: function() {
 		return this.fields.get("name");
 	}
-	,callFlashSync: function(err,data,callBackObj) {
-		return this.target.callFlashSync(err,data,callBackObj);
-	}
 	,__onData: function(args) {
 		return this.target.__onData(args);
 	}
@@ -203,12 +202,7 @@ HelloService.getInstance = function() {
 }
 HelloService.prototype = {
 	sayHello: function(x,y,cb) {
-		var platform;
-		x += ":js";
-		platform = "js";
-		Test.main2(function(err,data) {
-			cb.cbF(null,data,cb.obj);
-		});
+		ExternalConnectionAsync.callFlashSync(null,"flash call js",cb.obj);
 	}
 	,__class__: HelloService
 }
@@ -272,21 +266,6 @@ IECAsyc.__name__ = ["IECAsyc"];
 IECAsyc.prototype = {
 	__class__: IECAsyc
 }
-var IntIterator = function(min,max) {
-	this.min = min;
-	this.max = max;
-};
-$hxClasses["IntIterator"] = IntIterator;
-IntIterator.__name__ = ["IntIterator"];
-IntIterator.prototype = {
-	next: function() {
-		return this.min++;
-	}
-	,hasNext: function() {
-		return this.min < this.max;
-	}
-	,__class__: IntIterator
-}
 var Reflect = function() { }
 $hxClasses["Reflect"] = Reflect;
 Reflect.__name__ = ["Reflect"];
@@ -334,13 +313,20 @@ JsMain.main = function() {
 	JsMain.cnx = ExternalConnectionAsync.flashConnect("default","myFlashObject",JsMain.ctx);
 	ExternalConnectionAsync.instance = JsMain.cnx;
 	JsMain.hello = new Forwarder(JsMain.cnx,"hello",HelloService.getInstance());
+	haxe.Timer.delay(JsMain.test1,5000);
+}
+JsMain.test1 = function() {
+	console.log("test1");
+	JsMain.hello.sayHello("hi","god js call flash",JsMain.onCalljs);
 }
 JsMain.__onData = function(args) {
 	JsMain.cnx.__onData(args);
 }
-JsMain.callFlashSync = function(err,data,callBackObj) {
-	callBackObj.needRecall = false;
-	ExternalConnectionAsync.instance.resolve("main").resolve("onData").call([err,data,callBackObj]);
+JsMain.onCalljs = function(err,data) {
+	console.log("async come back " + data);
+}
+JsMain.onCalljs2 = function(err,data) {
+	console.log("2async come back " + data);
 }
 var List = function() {
 	this.length = 0;
@@ -391,162 +377,6 @@ StringTools.urlEncode = function(s) {
 }
 StringTools.urlDecode = function(s) {
 	return decodeURIComponent(s.split("+").join(" "));
-}
-var async = {}
-async.Build = function() { }
-$hxClasses["async.Build"] = async.Build;
-async.Build.__name__ = ["async","Build"];
-var Test = function() { }
-$hxClasses["Test"] = Test;
-Test.__name__ = ["Test"];
-Test.__interfaces__ = [async.Build];
-Test.asyncGet2 = function(v1,v2,cb) {
-	cb(null,v1,v2);
-}
-Test.bubblesort = function(array,__cb) {
-	var swapping = false;
-	var temp;
-	var __afterLoop4 = function() {
-		__cb(null,array);
-	};
-	var __loop3 = (function($this) {
-		var $r;
-		var __loop31 = null;
-		__loop31 = function() {
-			if(!swapping) {
-				swapping = true;
-				var __afterLoop1 = function() {
-					__loop31();
-				};
-				var __iter2 = new IntIterator(0,array.length);
-				var __loop0 = (function($this) {
-					var $r;
-					var __loop01 = null;
-					__loop01 = function() {
-						if(__iter2.hasNext()) {
-							var i = __iter2.next();
-							Test.delay(200,function(__e) {
-								if(__e == null) {
-									if(array[i] > array[i + 1]) {
-										temp = array[i + 1];
-										array[i + 1] = array[i];
-										array[i] = temp;
-										swapping = false;
-									}
-									__loop01();
-								} else __cb(__e,null);
-							});
-						} else __afterLoop1();
-					};
-					$r = __loop01;
-					return $r;
-				}(this));
-				__loop0();
-			} else __afterLoop4();
-		};
-		$r = __loop31;
-		return $r;
-	}(this));
-	__loop3();
-}
-Test.asynchronous = function(__cb) {
-	var arry;
-	Test.bubblesort([1337,1,-465,3.141592653589793,789,69,789,-132,3.141592653589793,465,789,0,27],function(__e,__0) {
-		if(__e == null) {
-			arry = __0;
-			__cb(null,arry);
-		} else __cb(__e,null);
-	});
-}
-Test.bubblesortSync = function(array) {
-	var swapping = false;
-	var temp;
-	while(!swapping) {
-		swapping = true;
-		var _g1 = 0, _g = array.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			if(array[i] > array[i + 1]) {
-				temp = array[i + 1];
-				array[i + 1] = array[i];
-				array[i] = temp;
-				swapping = false;
-			}
-		}
-	}
-	return array;
-}
-Test.getResult = function(err,data) {
-}
-Test.doFooParallel = function(arrayData,__cb) {
-	__cb(null,true);
-}
-Test.doFooGroup = function(arg1,__cb) {
-	__cb(null,true);
-}
-Test.doSomethingElseAsync = function(array,__cb) {
-	__cb(null,true);
-}
-Test.doSomethingElseAsync2 = function(element,__cb) {
-	__cb(null,element);
-}
-Test.doSomethingElseAsync3 = function(element,__cb) {
-	__cb(null,element,"1");
-}
-Test.main = function(callBack2) {
-}
-Test.main2 = function(__cb) {
-	Test.bubblesort([2,1,4,7],function(__e,arrayData) {
-		if(__e == null) {
-			var a = null, b = null, c = null, __parallelCounter0 = 3;
-			var __afterParallel1 = function(__e1) {
-				if(__e1 == null) {
-					if(--__parallelCounter0 == 0) {
-						var arr = [null,null,null];
-						Test.doFooGroup("group1",function(__e2,__5) {
-							if(__e2 == null) {
-								arr[0] = __5;
-								Test.doFooGroup("group2",function(__e3,__6) {
-									if(__e3 == null) {
-										arr[1] = __6;
-										Test.doFooGroup("group3",function(__e4,__7) {
-											if(__e4 == null) {
-												arr[2] = __7;
-												__cb(null,arr);
-											} else __cb(__e4,null);
-										});
-									} else __cb(__e3,null);
-								});
-							} else __cb(__e2,null);
-						});
-					}
-				} else if(__parallelCounter0 >= 0) {
-					__parallelCounter0 = -1;
-					__cb(__e1,null);
-				}
-			};
-			Test.doFooParallel(arrayData,function(__e1,__a2) {
-				a = __a2;
-				__afterParallel1(__e1);
-			});
-			Test.doFooParallel(arrayData,function(__e1,__b3) {
-				b = __b3;
-				__afterParallel1(__e1);
-			});
-			Test.doFooParallel(arrayData,function(__e1,__c4) {
-				c = __c4;
-				__afterParallel1(__e1);
-			});
-		} else __cb(__e,null);
-	});
-}
-Test.delay = function(ms,cb) {
-	haxe.Timer.delay(function() {
-		cb(null);
-	},ms);
-}
-Test.platformDelay = function(ms,fun) {
-	haxe.Timer.delay(fun,ms);
 }
 var ValueType = $hxClasses["ValueType"] = { __ename__ : ["ValueType"], __constructs__ : ["TNull","TInt","TFloat","TBool","TObject","TFunction","TClass","TEnum","TUnknown"] }
 ValueType.TNull = ["TNull",0];
@@ -637,9 +467,6 @@ Type["typeof"] = function(v) {
 		return ValueType.TUnknown;
 	}
 }
-async.Async = function() { }
-$hxClasses["async.Async"] = async.Async;
-async.Async.__name__ = ["async","Async"];
 haxe.Serializer = function() {
 	this.buf = new StringBuf();
 	this.cache = new Array();
@@ -1440,8 +1267,6 @@ js.Boot.__instanceof = function(o,cl) {
 js.Browser = function() { }
 $hxClasses["js.Browser"] = js.Browser;
 js.Browser.__name__ = ["js","Browser"];
-var $_;
-function $bind(o,m) { var f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; return f; };
 JsMain.onData = Reflect.makeVarArgs(JsMain.__onData);
 Math.__name__ = ["Math"];
 Math.NaN = Number.NaN;
@@ -1471,7 +1296,6 @@ var Enum = { };
 ExternalConnectionAsync.sn = 0;
 ExternalConnectionAsync.connections = new haxe.ds.StringMap();
 ExternalConnectionAsync.callBackList = new haxe.ds.StringMap();
-Test.__meta__ = { statics : { bubblesort : { async : null}, asynchronous : { async : null}, doFooParallel : { async : null}, doFooGroup : { async : null}, doSomethingElseAsync : { async : null}, doSomethingElseAsync2 : { async : null}, doSomethingElseAsync3 : { async : null}, main2 : { async : null}}};
 haxe.Serializer.USE_CACHE = false;
 haxe.Serializer.USE_ENUM_INDEX = false;
 haxe.Serializer.BASE64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%:";
@@ -1492,3 +1316,5 @@ function $hxExpose(src, path) {
 	o[parts[parts.length-1]] = src;
 }
 })();
+
+//@ sourceMappingURL=remoting.js.map

@@ -32,7 +32,7 @@ class HelloService implements IHelloServer{
 		var platform:String;
 		#if flash
 		platform = "flash";
-		 cb.cbF(null,x + y+" platform"+platform,{id:name,name:"sayHello"});
+		 cb.cbF(null,x + y+" platform"+platform,cb.obj);
 		#else
 		x += ":js";
 		platform = "js";

@@ -5,6 +5,7 @@ import js.Browser;
 
 import FormatAsync;
 using Reflect;
+import haxe.Timer;
 
 class JsMain {
      public static var cnx:ExternalConnectionAsync = null;
@@ -29,7 +30,22 @@ class JsMain {
 	   hello = new Forwarder(cnx, "hello", HelloService.getInstance());
 	  // trace("main---");
 	  
+	  
+	 Timer.delay(test1, 5000);
+	     
+	  
 	    }
+		
+		
+		public static function test1() {
+			trace("test1");
+			 hello.sayHello("hi", "god js call flash", onCalljs);
+
+        
+			
+		}
+		
+		
 	
 		public static function __onData(args: Array<Dynamic>) {
      
@@ -40,14 +56,17 @@ class JsMain {
 			
 		}
 		
-		public static function callFlashSync(err, data,callBackObj:CallBackObj):Void {
-         
-            callBackObj.needRecall = false;
-            ExternalConnectionAsync.instance.main.onData.call([err, data, callBackObj]);
-			
-		   
-		 
-			   
-		}
+		   public static function onCalljs(err, data):Void {
+
+        trace("async come back " + data);
+    }
+
+    public static function onCalljs2(err, data):Void {
+
+        trace("2async come back " + data);
+    }
+
+		
+	
 		
 }
