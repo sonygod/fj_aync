@@ -34,7 +34,9 @@ class FlashMain {
 	 timeCall();
     }
 	public static function timeCall():Void {
-		 hello.sayHello("hi", "god2"+Math.random()*1000, onCalljs2);
+		lastTime = Timer.stamp() * 1000;
+		 hello.sayHello("hi", "god2" + Math.random() * 1000, onCalljs2);
+		 
 	}
 	
 
@@ -43,9 +45,10 @@ class FlashMain {
         //trace("async come back "+Math.random()*1000 + data);
     }
 
+	private static var lastTime:Float = 0;
     public static function onCalljs2(err, data,?other):Void {
 
-        trace("2async come back " + Math.random() * 1000 + data);
+        trace("2async come back " + (Timer.stamp()*1000-lastTime)+ data);
 		timeCall();
     }
 

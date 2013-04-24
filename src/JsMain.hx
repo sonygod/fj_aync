@@ -39,7 +39,7 @@ class JsMain {
 		
 		
 		public static function test1() {
-		
+		lastTime = Timer.stamp() * 1000;
 			 hello.sayHello("hi", "god js call flash"+Math.random()*1000, onCalljs);
 
         
@@ -60,9 +60,11 @@ class JsMain {
 			
 		}
 		
+		private static var lastTime:Float = 0;
 		   public static function onCalljs(err, data):Void {
 
-       trace("async come back " + data);
+       trace("async come back "+(Timer.stamp()*1000-lastTime)+"   "+  data);
+	    test1();
     }
 
     public static function onCalljs2(err, data):Void {

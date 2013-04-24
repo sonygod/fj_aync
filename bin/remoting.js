@@ -71,7 +71,6 @@ ExternalConnectionAsync.flashConnect = function(name,flashObjectID,ctx) {
 ExternalConnectionAsync.callFlashSync = function(err,data,callBackObj) {
 	callBackObj.needRecall = false;
 	ExternalConnectionAsync.instance.resolve("main").resolve("onData").call([err,data,callBackObj]);
-	console.log("callback" + Std.string(callBackObj));
 	callBackObj = null;
 }
 ExternalConnectionAsync.prototype = {
@@ -342,6 +341,7 @@ JsMain.main = function() {
 	haxe.Timer.delay(JsMain.test1,3000);
 }
 JsMain.test1 = function() {
+	JsMain.lastTime = haxe.Timer.stamp() * 1000;
 	JsMain.hello.sayHello("hi","god js call flash" + Math.random() * 1000,JsMain.onCalljs);
 }
 JsMain.timeCall = function() {
@@ -351,7 +351,8 @@ JsMain.__onData = function(args) {
 	JsMain.cnx.__onData(args);
 }
 JsMain.onCalljs = function(err,data) {
-	console.log("async come back " + data);
+	console.log("async come back " + (haxe.Timer.stamp() * 1000 - JsMain.lastTime) + "   " + data);
+	JsMain.test1();
 }
 JsMain.onCalljs2 = function(err,data) {
 }
@@ -420,6 +421,12 @@ Test.bubblesort = function(array,__cb) {
 	var swapping = false;
 	var temp;
 	var __afterLoop4 = function() {
+		var t = 0;
+		var _g = 0;
+		while(_g < 400000000) {
+			var j = _g++;
+			t += 1 + j;
+		}
 		__cb(null,array);
 	};
 	var __loop3 = (function($this) {
@@ -917,6 +924,9 @@ haxe.Timer.delay = function(f,time_ms) {
 		f();
 	};
 	return t;
+}
+haxe.Timer.stamp = function() {
+	return new Date().getTime() / 1000;
 }
 haxe.Timer.prototype = {
 	run: function() {
@@ -1482,6 +1492,7 @@ var Enum = { };
 ExternalConnectionAsync.sn = 0;
 ExternalConnectionAsync.connections = new haxe.ds.StringMap();
 ExternalConnectionAsync.callBackList = new haxe.ds.StringMap();
+JsMain.lastTime = 0;
 Test.__meta__ = { statics : { bubblesort : { async : null}, asynchronous : { async : null}, doFooParallel : { async : null}, doFooGroup : { async : null}, doSomethingElseAsync : { async : null}, doSomethingElseAsync2 : { async : null}, doSomethingElseAsync3 : { async : null}, main2 : { async : null}}};
 haxe.Serializer.USE_CACHE = false;
 haxe.Serializer.USE_ENUM_INDEX = false;

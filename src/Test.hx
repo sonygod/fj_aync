@@ -35,8 +35,13 @@ class Test implements Build
 				}
 			}
 		}
+		var t:Float = 0;
 		
+		for (j in 0...400000000) {
+			
 		
+			t += (1+j);
+		}
 		
 	
 		return array;
