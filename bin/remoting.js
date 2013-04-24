@@ -71,6 +71,7 @@ ExternalConnectionAsync.flashConnect = function(name,flashObjectID,ctx) {
 ExternalConnectionAsync.callFlashSync = function(err,data,callBackObj) {
 	callBackObj.needRecall = false;
 	ExternalConnectionAsync.instance.resolve("main").resolve("onData").call([err,data,callBackObj]);
+	console.log("callback" + Std.string(callBackObj));
 	callBackObj = null;
 }
 ExternalConnectionAsync.prototype = {
@@ -79,7 +80,8 @@ ExternalConnectionAsync.prototype = {
 		if(callBackObj.needRecall == true) args.push({ cbF : ExternalConnectionAsync.callFlashSync, obj : callBackObj}); else {
 		}
 		var classObject = this.getcallBackList().get(callBackObj.id + "");
-		var method = this.getcallBackList().get(callBackObj.id + callBackObj.name + callBackObj.sn);
+		var method;
+		if(callBackObj.needRecall) method = this.getcallBackList().get(callBackObj.id + callBackObj.name + callBackObj.sn + Std.string(callBackObj.needRecall)); else method = this.getcallBackList().get(callBackObj.id + callBackObj.name + callBackObj.sn);
 		var classCallback = classObject.callBack;
 		var theCallMethod;
 		if(method != null) theCallMethod = method.callBack; else theCallMethod = Reflect.field(classCallback,callBackObj.name);
@@ -88,7 +90,7 @@ ExternalConnectionAsync.prototype = {
 		} catch( e ) {
 			console.log(e);
 		}
-		this.getcallBackList().remove(callBackObj.id + callBackObj.name + callBackObj.sn);
+		if(callBackObj.needRecall) this.getcallBackList().remove(callBackObj.id + callBackObj.name + callBackObj.sn + Std.string(callBackObj.needRecall)); else this.getcallBackList().remove(callBackObj.id + callBackObj.name + callBackObj.sn);
 		classCallback = null;
 		method = null;
 		classObject = null;
@@ -105,7 +107,7 @@ ExternalConnectionAsync.prototype = {
 			var callBackF = params.pop();
 			var p = params[params.length - 1];
 			p.sn = ExternalConnectionAsync.sn + "";
-			ExternalConnectionAsync.callBackList.set(p.id + p.name + ExternalConnectionAsync.sn,{ id : p.id, name : p.name, callBack : callBackF, sn : ExternalConnectionAsync.sn + ""});
+			if(!p.needRecall) ExternalConnectionAsync.callBackList.set(p.id + p.name + ExternalConnectionAsync.sn,{ id : p.id, name : p.name, callBack : callBackF, sn : ExternalConnectionAsync.sn + ""}); else ExternalConnectionAsync.callBackList.set(p.id + p.name + ExternalConnectionAsync.sn + Std.string(p.needRecall),{ id : p.id, name : p.name, callBack : callBackF, sn : ExternalConnectionAsync.sn + ""});
 			p.needRecall = true;
 			callBackF = null;
 		}
@@ -341,7 +343,6 @@ JsMain.main = function() {
 }
 JsMain.test1 = function() {
 	JsMain.hello.sayHello("hi","god js call flash" + Math.random() * 1000,JsMain.onCalljs);
-	setInterval(JsMain.timeCall,100);
 }
 JsMain.timeCall = function() {
 	JsMain.hello.sayHello("hi","god2" + Math.random() * 1000,JsMain.onCalljs2);
@@ -350,6 +351,7 @@ JsMain.__onData = function(args) {
 	JsMain.cnx.__onData(args);
 }
 JsMain.onCalljs = function(err,data) {
+	console.log("async come back " + data);
 }
 JsMain.onCalljs2 = function(err,data) {
 }

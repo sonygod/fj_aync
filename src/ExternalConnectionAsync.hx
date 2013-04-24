@@ -85,8 +85,11 @@ class ExternalConnectionAsync implements Connection implements Dynamic<Connectio
 		 var callBackF = params.pop();
 	  
 		 var p:CallBackObj = params[params.length - 1];
-		 p.sn = sn+"";
+		 p.sn = sn + "";
+		 if(!p.needRecall)
 		 callBackList.set(p.id + p.name + sn, { id:p.id, name:p.name, callBack:callBackF, sn:sn + "" } );
+		 else
+		 callBackList.set(p.id + p.name + sn+p.needRecall, { id:p.id, name:p.name, callBack:callBackF, sn:sn + "" } );
 		 p.needRecall = true;
 		 callBackF = null;
 		}
@@ -192,7 +195,8 @@ class ExternalConnectionAsync implements Connection implements Dynamic<Connectio
            //get callBackObject
 		    var callBackObj :CallBackObj =args.pop();
 			//add callBack function to args
-		
+		     
+			
 			if (callBackObj.needRecall==true) {
 				
 				 args.push({cbF:callFlashSync,obj:callBackObj});
@@ -202,7 +206,13 @@ class ExternalConnectionAsync implements Connection implements Dynamic<Connectio
 			
 	         //get current platform class
 			var classObject:CallBackObjWithFun = getcallBackList().get(callBackObj.id+"");
-            var method:CallBackObjWithFun = getcallBackList().get(callBackObj.id + callBackObj.name + callBackObj.sn);
+            var method:CallBackObjWithFun ;//= 
+			
+			if (callBackObj.needRecall) {
+				method=getcallBackList().get(callBackObj.id + callBackObj.name + callBackObj.sn+callBackObj.needRecall);
+			}else {
+				method = getcallBackList().get(callBackObj.id + callBackObj.name + callBackObj.sn);
+			}
 			
 			var classCallback :Dynamic = classObject.callBack;
 			var theCallMethod:Dynamic;
@@ -229,7 +239,11 @@ class ExternalConnectionAsync implements Connection implements Dynamic<Connectio
 				
 				
 			}
-			getcallBackList().remove(callBackObj.id + callBackObj.name + callBackObj.sn);
+			if (callBackObj.needRecall){
+			getcallBackList().remove(callBackObj.id + callBackObj.name + callBackObj.sn+callBackObj.needRecall);
+			}else {
+				getcallBackList().remove(callBackObj.id + callBackObj.name + callBackObj.sn);
+			}
 			classCallback = null;
 			method = null;
 			classObject = null;
@@ -247,8 +261,10 @@ class ExternalConnectionAsync implements Connection implements Dynamic<Connectio
             ExternalConnectionAsync.instance.main.onData.call([err, data, callBackObj]);
 		
 		   
-		 callBackObj = null;
-			   
+		 
+		  
+		
+		callBackObj = null;  
 		}
 	
 	

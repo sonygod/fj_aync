@@ -12,7 +12,7 @@
     <movie minorVersion="0" />
     <movie platform="JavaScript" />
     <movie background="#FFFFFF" />
-    <movie preferredSDK="Haxe6463;3.0;" />
+    <movie preferredSDK="Haxe 3.6463;3.6463;" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>

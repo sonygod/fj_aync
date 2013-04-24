@@ -13,7 +13,9 @@ class Main  {
 	static function main() {
 		
 		
-	  FlashMain.main();
+	FlashMain.main();
+	
+	
 	}
 }
 

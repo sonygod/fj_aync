@@ -24,25 +24,29 @@ class FlashMain {
         var arr2 = arr.slice(0, arr.length - 1);
         hello = new Forwarder(cnx, "hello", HelloService.getInstance());
 
-        hello.sayHello("hi", "god", onCalljs);
+     //   hello.sayHello("hi", "god", onCalljs);
 
-        hello.sayHello("hi", "god2", onCalljs2);
+      //  hello.sayHello("hi", "god2", onCalljs2);
 	 
 	
 	 
-
+	 //  untyped __global__['flash.utils.setInterval'](timeCall, 100);
+	 timeCall();
     }
-	
+	public static function timeCall():Void {
+		 hello.sayHello("hi", "god2"+Math.random()*1000, onCalljs2);
+	}
 	
 
     public static function onCalljs(err, data ,?other):Void {
 
-        trace("async come back "+Math.random()*1000 + data);
+        //trace("async come back "+Math.random()*1000 + data);
     }
 
-    public static function onCalljs2(err, data):Void {
+    public static function onCalljs2(err, data,?other):Void {
 
-        trace("2async come back "+Math.random()*1000 + data);
+        trace("2async come back " + Math.random() * 1000 + data);
+		timeCall();
     }
 
     public static function __onData(args:Array<Dynamic>) {

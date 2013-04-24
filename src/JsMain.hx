@@ -32,7 +32,7 @@ class JsMain {
 	  // trace("main---");
 	  
 	  
-	 Timer.delay(test1, 3000);
+	Timer.delay(test1, 3000);
 	     
 	  
 	    }
@@ -44,7 +44,7 @@ class JsMain {
 
         
 			//GlobalTimer.setInterval(timeCall, 100, []);
-			untyped __js__('setInterval')(timeCall, 100);
+		
 		}
 		
 		public static function timeCall():Void {
@@ -62,7 +62,7 @@ class JsMain {
 		
 		   public static function onCalljs(err, data):Void {
 
-        //trace("async come back " + data);
+       trace("async come back " + data);
     }
 
     public static function onCalljs2(err, data):Void {
