@@ -4,3 +4,7 @@ useage:
 
        hello.sayHello("hi", "god", onCalljs);
 
+how to debug js file? run in debugger model  and FD auto create yourjs.js.map at the same path with your js file 
+install chrome dev 28.0.1464.0
+and  select enable  Enable source maps in the dev setting panel 
+and the Indentation choose 4 default
